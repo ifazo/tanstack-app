@@ -1,22 +1,16 @@
-import { useQuery } from "@tanstack/react-query"
+import { useParams } from "@tanstack/react-router"
+import { usePost } from "../services/queries"
 
 export default function ProductPage() {
-    const id = 1
-    const { isPending, error, data, isFetching } = useQuery({
-        queryKey: [ 'post', id ],
-        queryFn: () =>
-            fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
-                .then(res => res.json())
-                .then(data => console.log(data))
-                .catch(err => console.log(err))
-    })
-    if (isPending) return 'Loading...'
-    if (error) return 'An error has occurred: ' + error.message
-    if (isFetching) return 'Updating...'
-    console.log(data)
+    const { postId } = useParams({ strict: false })
+    const product = usePost(Number(postId))
+    const { data, isLoading, isError, error } = product
+    if (isLoading) return <div>Loading...</div>
+    if (isError) return <div>Error: {error.message}</div>
+    console.log(data?.data)
     return (
         <div>
-            <p>Product Details of : id</p>
+            <p>Product Details of : {data?.data.title}</p>
         </div>
     )
 }

@@ -8,7 +8,7 @@ export default function App() {
   return (
     <>
       <RouterProvider router={router} />
-      <ReactQueryDevtools />
+      <ReactQueryDevtools initialIsOpen={false} />
     </>
   )
 }

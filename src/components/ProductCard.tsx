@@ -1,8 +1,14 @@
+import { Link } from "@tanstack/react-router"
+import { Post } from "../types"
 
 
-export default function ProductCard(product: any) {
+export default function ProductCard({ product }: { product: Post }) {
   console.log(product)
   return (
-    <div>{product.title}</div>
+    <div>
+      <Link to="/products/$postId" params={{ postId: product.id.toString() }} preload="intent">
+        {product.title}
+      </Link>
+    </div>
   )
 }

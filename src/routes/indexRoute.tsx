@@ -20,8 +20,8 @@ const productsRoute = new Route({
 })
 
 const productRoute = new Route({
-    getParentRoute: () => productsRoute,
-    path: '/:id',
+    getParentRoute: () => rootRoute,
+    path: '/products/$postId',
     component: () => <ProductPage />,
 })
 
