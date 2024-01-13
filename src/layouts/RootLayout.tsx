@@ -9,8 +9,8 @@ export default function RootLayout() {
         <div>
             <Header />
             <Outlet />
-            <TanStackRouterDevtools />
             <Footer />
+            <TanStackRouterDevtools />
         </div>
     )
 }

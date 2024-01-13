@@ -7,6 +7,12 @@ export default function Header() {
       <Link to="/" className="[&.active]:font-bold">
         Home
       </Link>
+      <Link to="/products" className="[&.active]:font-bold">
+        Product
+      </Link>
+      <Link to="/categories" className="[&.active]:font-bold">
+        Category
+      </Link>
       <Link to="/about" className="[&.active]:font-bold">
         About
       </Link>
