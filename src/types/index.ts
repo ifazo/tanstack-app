@@ -1,6 +1,20 @@
-export interface Post {
-    userId: number;
+type Product = {
     id: number;
     title: string;
-    body: string;
-    }
+    description: string;
+    price: number;
+    discountPercentage: number;
+    rating: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
+    images: string[];
+};
+
+type Category = {
+    id: number;
+    name: string;
+};
+
+export type { Product, Category };

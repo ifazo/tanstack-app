@@ -6,6 +6,8 @@ import HomePage from "../pages/HomePage";
 import ProductsPage from "../pages/ProductsPage";
 import CategoriesPage from "../pages/CategoriesPage";
 import ProductPage from "../pages/ProductPage";
+import SignUpPage from "../pages/SignUpPage";
+import ErrorPage from "../pages/ErrorPage";
 
 const homeRoute = new Route({
     getParentRoute: () => rootRoute,
@@ -43,6 +45,18 @@ const signInRoute = new Route({
     component: () => <SignInPage />,
 })
 
-const indexRoute = [ homeRoute, productsRoute, productRoute, categoriesRoute, aboutRoute, signInRoute ]
+const signUpRoute = new Route({
+    getParentRoute: () => rootRoute,
+    path: '/sign-up',
+    component: () => <SignUpPage />,
+})
+
+const errorRoute = new Route({
+    getParentRoute: () => rootRoute,
+    path: '*',
+    component: () => <ErrorPage />,
+})
+
+const indexRoute = [ homeRoute, productsRoute, productRoute, categoriesRoute, aboutRoute, signInRoute, signUpRoute, errorRoute]
 
 export default indexRoute;

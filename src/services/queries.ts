@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPost, getPosts } from "./api";
+import { getProduct, getProducts } from "./api";
 
-export function usePosts() {
-    return useQuery({
-        queryKey: ["posts"],
-        queryFn: () => getPosts(),
-    })
+export function useProducts() {
+  return useQuery({
+    queryKey: ["products"],
+    queryFn: () => getProducts(),
+  });
 }
 
-export function usePost(id: number) {
-    return useQuery({
-        queryKey: ["post", id],
-        queryFn: () => getPost(id),
-    })
+export function useProduct(id: number) {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProduct(id),
+  });
 }
