@@ -9,6 +9,7 @@ import ProductPage from "../pages/ProductPage";
 import SignUpPage from "../pages/SignUpPage";
 import ErrorPage from "../pages/ErrorPage";
 import CategoryPage from "../pages/CategoryPage";
+import DashboardPage from "../pages/DashboardPage";
 
 const homeRoute = new Route({
     getParentRoute: () => rootRoute,
@@ -61,7 +62,7 @@ const signUpRoute = new Route({
 const dashboardRoute = new Route({
     getParentRoute: () => rootRoute,
     path: '/dashboard',
-    component: () => <SignUpPage />,
+    component: () => <DashboardPage />,
 })
 
 const errorRoute = new Route({
