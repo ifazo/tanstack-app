@@ -20,15 +20,13 @@ function classNames(...classes: string[]) {
 }
 
 export default function ProductsPage() {
-    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false)
     const limit = 12;
     const [skip, setSkip] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const res = useProductsByPage(limit, skip)
-    const response = useCategories()
-    const { data: categories, error: categoriesError } = response
-    const { data: products, error: productsError } = res
+    const { data: products, error: productsError } = useProductsByPage(limit, skip)
+    const { data: categories, error: categoriesError } = useCategories()
     
     const total = products?.data.total
     const totalPages = Math.ceil(total / limit);
@@ -187,7 +185,14 @@ export default function ProductsPage() {
                                 <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
                                     {categories?.data.map((category: string, index: number) => (
                                         <li key={index}>
-                                            <a href={category}>{category}</a>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    console.log(category)
+                                                }}
+                                            >
+                                                {category}
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>
@@ -203,7 +208,7 @@ export default function ProductsPage() {
                                             {
                                                 products?.data.products.map((product: Product) => {
                                                     return (
-                                                        <Link to="/products/$postId" params={{ postId: product.id.toString() }} preload="intent" key={product.id}>
+                                                        <Link to="/products/$productId" params={{ productId: product.id.toString() }} preload="intent" key={product.id}>
                                                             <div className="group">
                                                                 <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                                                                     <img
@@ -226,7 +231,7 @@ export default function ProductsPage() {
 
                         </div>
                     </section>
-                    <Pagination limit={limit} skip={skip} pageNumbers={pageNumbers} currentPage={currentPage} onPageChange={onPageChange} total={total} totalPages={totalPages} />
+                    <Pagination limit={limit} pageNumbers={pageNumbers} currentPage={currentPage} onPageChange={onPageChange} total={total} totalPages={totalPages} />
                 </main>
             </div>
         </div>

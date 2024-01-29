@@ -13,7 +13,7 @@ export const getProductsByPage = (limit: number, skip: number) =>
   api.get(`/products?limit=${limit}&skip=${skip}`);
 
 export const getProductsByCategory = (category: string) =>
-  api.get(`/products?category=${category}`);
+  api.get(`/products/category/${category}`);
 
 export const createProduct = (data: Product) => api.post("/products", data);
 

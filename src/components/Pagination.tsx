@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
-export default function Pagination({ limit, skip, pageNumbers, onPageChange, currentPage, total, totalPages }: { limit: number, skip: number, pageNumbers: number[], onPageChange: (page: number) => void, currentPage: number,total: number, totalPages: number}) {
-    console.log(`Rendering page ${currentPage} with limit ${limit} and skip ${skip}...`)
+export default function Pagination({ limit, pageNumbers, onPageChange, currentPage, total, totalPages }: { limit: number, pageNumbers: number[], onPageChange: (page: number) => void, currentPage: number,total: number, totalPages: number}) {
+    
     return (
         <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
             {/* Previous and Next buttons for mobile view */}

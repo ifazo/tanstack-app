@@ -3,8 +3,8 @@ import { useProduct } from "../lib/queries"
 import ProductDetails from "../components/ProductDetails"
 
 export default function ProductPage() {
-    const { postId } = useParams({ strict: false })
-    const response = useProduct(Number(postId))
+    const { productId } = useParams({ strict: false })
+    const response = useProduct(Number(productId))
     const { data, error } = response
     if (error) return <div>Error: {error.message}</div>
     if (!data) return <div>Loading...</div>

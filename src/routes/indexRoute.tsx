@@ -8,6 +8,7 @@ import CategoriesPage from "../pages/CategoriesPage";
 import ProductPage from "../pages/ProductPage";
 import SignUpPage from "../pages/SignUpPage";
 import ErrorPage from "../pages/ErrorPage";
+import CategoryPage from "../pages/CategoryPage";
 
 const homeRoute = new Route({
     getParentRoute: () => rootRoute,
@@ -23,7 +24,7 @@ const productsRoute = new Route({
 
 const productRoute = new Route({
     getParentRoute: () => rootRoute,
-    path: '/products/$postId',
+    path: '/products/$productId',
     component: () => <ProductPage />,
 })
 
@@ -31,6 +32,12 @@ const categoriesRoute = new Route({
     getParentRoute: () => rootRoute,
     path: '/categories',
     component: () => <CategoriesPage />,
+})
+
+const categoryRoute = new Route({
+    getParentRoute: () => rootRoute,
+    path: '/categories/$category',
+    component: () => <CategoryPage />,
 })
 
 const aboutRoute = new Route({
@@ -63,6 +70,6 @@ const errorRoute = new Route({
     component: () => <ErrorPage />,
 })
 
-const indexRoute = [ homeRoute, productsRoute, productRoute, categoriesRoute, aboutRoute, signInRoute, signUpRoute, dashboardRoute, errorRoute]
+const indexRoute = [homeRoute, productsRoute, productRoute, categoriesRoute, categoryRoute, aboutRoute, signInRoute, signUpRoute, dashboardRoute, errorRoute]
 
 export default indexRoute;

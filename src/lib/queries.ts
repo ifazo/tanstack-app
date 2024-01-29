@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getProduct, getProducts, getProductsByPage } from "./api";
+import { getCategories, getProduct, getProducts, getProductsByCategory, getProductsByPage } from "./api";
 
 export function useProducts() {
   return useQuery({
@@ -12,6 +12,13 @@ export function useProductsByPage(limit: number, skip: number) {
   return useQuery({
     queryKey: ["products", limit, skip],
     queryFn: () => getProductsByPage(limit, skip),
+  });
+}
+
+export function useProductByCategory(category: string) {
+  return useQuery({
+    queryKey: ["products", category],
+    queryFn: () => getProductsByCategory(category),
   });
 }
 
