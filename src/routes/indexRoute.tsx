@@ -51,12 +51,18 @@ const signUpRoute = new Route({
     component: () => <SignUpPage />,
 })
 
+const dashboardRoute = new Route({
+    getParentRoute: () => rootRoute,
+    path: '/dashboard',
+    component: () => <SignUpPage />,
+})
+
 const errorRoute = new Route({
     getParentRoute: () => rootRoute,
     path: '*',
     component: () => <ErrorPage />,
 })
 
-const indexRoute = [ homeRoute, productsRoute, productRoute, categoriesRoute, aboutRoute, signInRoute, signUpRoute, errorRoute]
+const indexRoute = [ homeRoute, productsRoute, productRoute, categoriesRoute, aboutRoute, signInRoute, signUpRoute, dashboardRoute, errorRoute]
 
 export default indexRoute;

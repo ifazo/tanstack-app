@@ -1,5 +1,5 @@
 import { useParams } from "@tanstack/react-router"
-import { useProduct } from "../services/queries"
+import { useProduct } from "../lib/queries"
 import ProductDetails from "../components/ProductDetails"
 
 export default function ProductPage() {

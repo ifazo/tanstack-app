@@ -4,5 +4,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: ["@tailwindcss/typography"],
+  plugins: ["@tailwindcss/typography", "@tailwindcss/forms"],
 };
