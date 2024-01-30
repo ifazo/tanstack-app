@@ -1,21 +1,7 @@
-/*
-  This example requires Tailwind CSS v2.0+ 
-  
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/typography'),
-    ],
-  }
-  ```
-*/
 import { StarIcon } from '@heroicons/react/16/solid'
 import { Product } from '../types'
+import { addToCart } from '../store'
+import toast from 'react-hot-toast'
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -186,7 +172,11 @@ export default function ProductDetails({ product }: { product: Product }) {
                                 </div>
 
                                 <button
-                                    type="submit"
+                                    type='button'
+                                    onClick={() => {
+                                        addToCart(product)
+                                        toast.success('Added to cart')
+                                    }}
                                     className="mt-8 w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     Add to cart
