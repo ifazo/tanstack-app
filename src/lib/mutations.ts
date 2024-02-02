@@ -9,6 +9,9 @@ export function useCreateProduct() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
         },
+        onError: (error) => {
+            console.error(error);
+        }
     });
 }
 
@@ -18,6 +21,9 @@ export function useUpdateProduct() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
         },
+        onError: (error) => {
+            console.error(error);
+        }
     });
 }
 
@@ -27,5 +33,8 @@ export function useDeleteProduct() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
         },
+        onError: (error) => {
+            console.error(error);
+        }
     });
 }

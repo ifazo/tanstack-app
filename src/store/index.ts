@@ -2,14 +2,35 @@ import { Store } from "@tanstack/react-store";
 import { Product, State } from "../types";
 
 const store = new Store<State>({
-  dogs: 0,
-  cats: 0,
+  wishlist: [],
   cart: [],
   user: {
-    name: "",
     email: "",
   },
 });
+
+export const profile = (email: string) => {
+  store.setState((state) => ({
+    ...state,
+    user: {
+      email,
+    },
+  }));
+};
+
+export const addToWishlist = (product: Product) => {
+  store.setState((state) => ({
+    ...state,
+    wishlist: [...state.wishlist, product],
+  }));
+};
+
+export const removeFromWishlist = (product: Product) => {
+  store.setState((state) => ({
+    ...state,
+    wishlist: state.wishlist.filter((p) => p !== product),
+  }));
+};
 
 export const addToCart = (product: Product) => {
   store.setState((state) => {

@@ -1,9 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import supabase from "../lib/supabase";
 import toast from "react-hot-toast";
+import { profile } from "../store";
 
 
 export default function SignInPage() {
+
   const form = useForm({
     defaultValues: {
       email: '',
@@ -18,8 +20,9 @@ export default function SignInPage() {
         toast.error(error.message)
         return
       }
-      if (data) {
+      if (data.user.email) {
         toast.success('Login success')
+        profile(data.user.email)
       }
     },
   })

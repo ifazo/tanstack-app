@@ -24,7 +24,7 @@ export default function CategoriesPage() {
             categories.map((category: string) => (
               <Link
                 key={category}
-                href={`/categories/${category}`}
+                to="/categories/$category"
                 params={{ category }}
                 className="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition dark:bg-slate-900 dark:border-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
               >

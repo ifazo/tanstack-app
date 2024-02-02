@@ -2,6 +2,7 @@ import { useStore } from '@tanstack/react-store';
 import { Product } from '../types';
 import store, { removeFromCart } from '../store';
 import toast from 'react-hot-toast';
+import { Link } from '@tanstack/react-router';
 
 export default function Cart() {
     const products = useStore(store, (state) => state.cart);
@@ -99,9 +100,11 @@ export default function Cart() {
                         <div className="mt-6 text-sm text-center">
                             <p>
                                 or{' '}
-                                <a href="#" className="text-indigo-600 font-medium hover:text-indigo-500">
-                                    Continue Shopping<span aria-hidden="true"> &rarr;</span>
-                                </a>
+                                <Link
+                                    to='/dashboard/checkout'
+                                    className="text-indigo-600 font-medium hover:text-indigo-500">
+                                    Continue to cheackout<span aria-hidden="true"> &rarr;</span>
+                                </Link>
                             </p>
                         </div>
                     </section>

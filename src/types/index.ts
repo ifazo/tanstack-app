@@ -10,6 +10,7 @@ type Product = {
   category: string;
   thumbnail: string;
   images: string[];
+  ouantity?: number;
 };
 
 type Category = {
@@ -18,13 +19,12 @@ type Category = {
 };
 
 type User = {
-  name: string;
   email: string;
+  name?: string;
 };
 
 type State = {
-  dogs: number;
-  cats: number;
+  wishlist: Product[];
   cart: Product[];
   user: User;
 };

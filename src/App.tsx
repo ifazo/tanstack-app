@@ -1,8 +1,8 @@
 import './App.css'
 import { RouterProvider } from '@tanstack/react-router'
-import router from './routes/rootRoute'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Toaster } from 'react-hot-toast';
+import router from './routes';
 
 export default function App() {
   return (

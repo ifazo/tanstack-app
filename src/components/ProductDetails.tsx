@@ -1,6 +1,6 @@
 import { StarIcon } from '@heroicons/react/16/solid'
 import { Product } from '../types'
-import { addToCart } from '../store'
+import { addToCart, addToWishlist } from '../store'
 import toast from 'react-hot-toast'
 
 function classNames(...classes: string[]) {
@@ -85,16 +85,16 @@ export default function ProductDetails({ product }: { product: Product }) {
                                     alt={product.title}
                                     className='lg:col-span-2 lg:row-span-2'
                                 />
-                                    <img
-                                        src={product.images[0]}
-                                        alt={product.title}
-                                        className='hidden lg:block rounded-lg'
-                                    />
-                                    <img
-                                        src={product.images[1]}
-                                        alt={product.title}
-                                        className='hidden lg:block rounded-lg'
-                                    />
+                                <img
+                                    src={product.images[0]}
+                                    alt={product.title}
+                                    className='hidden lg:block rounded-lg'
+                                />
+                                <img
+                                    src={product.images[1]}
+                                    alt={product.title}
+                                    className='hidden lg:block rounded-lg'
+                                />
                             </div>
                         </div>
 
@@ -139,10 +139,17 @@ export default function ProductDetails({ product }: { product: Product }) {
                                 {/* Size picker */}
                                 <div className="mt-8">
                                     <div className="flex items-center justify-between">
-                                        <h2 className="text-sm font-medium text-gray-900">Size</h2>
-                                        <a href="#" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                                            See sizing chart
-                                        </a>
+                                        <h2 className="text-sm font-medium text-gray-900">Save</h2>
+                                        <button
+                                            type='button'
+                                            onClick={() => {
+                                                addToWishlist(product)
+                                                toast.success('Added to wishlist')
+                                            }
+                                            }
+                                            className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                            Save to Wishlist
+                                        </button>
                                     </div>
 
                                     {/* <RadioGroup value={selectedSize} onChange={setSelectedSize} className="mt-2">
