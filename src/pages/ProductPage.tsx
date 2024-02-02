@@ -1,10 +1,10 @@
 import { useParams } from "@tanstack/react-router"
-import { useProduct } from "../lib/queries"
+import { useGetProduct } from "../lib/queries"
 import ProductDetails from "../components/ProductDetails"
 
 export default function ProductPage() {
-    const { productId } = useParams({ strict: false })
-    const response = useProduct(productId)
+    const { productId } = useParams({ strict: false }) as { productId: string }
+    const response = useGetProduct(Number(productId))
     const { data, error } = response
     if (error) return <div>Error: {error.message}</div>
     if (!data) return <div>Loading...</div>

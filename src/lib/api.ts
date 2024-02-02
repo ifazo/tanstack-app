@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Product } from "../types";
 
 const baseUrl = "https://dummyjson.com";
 
@@ -14,13 +13,6 @@ export const getProductsByPage = (limit: number, skip: number) =>
 
 export const getProductsByCategory = (category: string) =>
   api.get(`/products/category/${category}`);
-
-export const createProduct = (data: Product) => api.post("/products", data);
-
-export const updateProduct = (id: number, data: Product) =>
-  api.put(`/products/${id}`, data);
-
-export const deleteProduct = (id: number) => api.delete(`/products/${id}`);
 
 export const getProduct = (id: number) => api.get(`/products/${id}`);
 

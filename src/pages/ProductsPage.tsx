@@ -1,11 +1,11 @@
-import { Link } from "@tanstack/react-router"
-import { useCategories, useProductsByPage } from "../lib/queries"
+import { useGetCategories, useGetProductsByPage } from "../lib/queries"
 import { Product } from "../types"
 import { Fragment, useState } from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, FunnelIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
 import Pagination from "../components/Pagination"
+import ProductCard from "../components/ProductCard"
 
 const sortOptions = [
     { name: 'Most Popular', href: '#', current: true },
@@ -25,9 +25,9 @@ export default function ProductsPage() {
     const [skip, setSkip] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const { data: products, error: productsError } = useProductsByPage(limit, skip)
-    const { data: categories, error: categoriesError } = useCategories()
-    
+    const { data: products, error: productsError } = useGetProductsByPage(limit, skip)
+    const { data: categories, error: categoriesError } = useGetCategories()
+
     const total = products?.data.total
     const totalPages = Math.ceil(total / limit);
     const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
@@ -206,23 +206,7 @@ export default function ProductsPage() {
 
                                         <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
                                             {
-                                                products?.data.products.map((product: Product) => {
-                                                    return (
-                                                        <Link to="/products/$productId" params={{ productId: product.id.toString() }} preload="intent" key={product.id}>
-                                                            <div className="group">
-                                                                <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                                                                    <img
-                                                                        src={product.thumbnail}
-                                                                        alt={product.title}
-                                                                        className="h-full w-full object-cover object-center group-hover:opacity-75"
-                                                                    />
-                                                                </div>
-                                                                <h3 className="mt-4 text-sm text-gray-700">{product.title}</h3>
-                                                                <p className="mt-1 text-lg font-medium text-gray-900">${product.price}</p>
-                                                            </div>
-                                                        </Link>
-                                                    )
-                                                })
+                                                products?.data.products.map((product: Product) => <ProductCard key={product.id} product={product} />)
                                             }
                                         </div>
                                     </div>

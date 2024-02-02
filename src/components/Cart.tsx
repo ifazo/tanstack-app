@@ -7,7 +7,20 @@ import { Link } from '@tanstack/react-router';
 export default function Cart() {
     const products = useStore(store, (state) => state.cart);
     const totalPrice = products.reduce((total, product) => total + product.price, 0);
-    
+    if (products.length === 0) {
+        return (
+            <div className="bg-white">
+                <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
+                    <h1 className="text-3xl font-extrabold text-center tracking-tight text-gray-900 sm:text-4xl">Shopping Cart</h1>
+                    <div className="mt-12">
+                        <p className="text-center text-sm font-medium text-gray-500">
+                            Your cart is empty
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="bg-white">
             <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-0">
@@ -91,6 +104,7 @@ export default function Cart() {
                         <div className="mt-10">
                             <button
                                 type="submit"
+                                onClick={() => toast.success('Checkout coming soon')}
                                 className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                             >
                                 Checkout
@@ -101,9 +115,9 @@ export default function Cart() {
                             <p>
                                 or{' '}
                                 <Link
-                                    to='/dashboard/checkout'
+                                    to='/'
                                     className="text-indigo-600 font-medium hover:text-indigo-500">
-                                    Continue to cheackout<span aria-hidden="true"> &rarr;</span>
+                                    Continue to shopping<span aria-hidden="true"> &rarr;</span>
                                 </Link>
                             </p>
                         </div>

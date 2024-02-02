@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router"
-import { useCategories } from "../lib/queries"
+import { useGetCategories } from "../lib/queries"
 
 export default function CategoriesPage() {
   // const [category, setCategory] = useState<string>("")
-  const { data, error } = useCategories()
-  // const { data: productsByCategory, error: productsByCategoryError } = useProductByCategory(category)
+  const { data, error } = useGetCategories()
+  // const { data: productsByCategory, error: productsByCategoryError } = useGetProductByCategory(category)
   // console.log(productsByCategory)
   if (error) {
     return <div>{error.message}</div>

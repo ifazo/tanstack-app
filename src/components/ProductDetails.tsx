@@ -1,6 +1,6 @@
 import { StarIcon } from '@heroicons/react/16/solid'
 import { Product } from '../types'
-import { addToCart, addToWishlist } from '../store'
+import { addToCart } from '../store'
 import toast from 'react-hot-toast'
 
 function classNames(...classes: string[]) {
@@ -8,7 +8,7 @@ function classNames(...classes: string[]) {
 }
 
 export default function ProductDetails({ product }: { product: Product }) {
-
+    // const createProduct = useCreateProduct()
     return (
         <div className="bg-white">
             <div className="pt-6 pb-16 sm:pb-24">
@@ -143,12 +143,12 @@ export default function ProductDetails({ product }: { product: Product }) {
                                         <button
                                             type='button'
                                             onClick={() => {
-                                                addToWishlist(product)
-                                                toast.success('Added to wishlist')
+                                                addToCart(product)
+                                                // toast.success('Added to wishlist')
                                             }
                                             }
                                             className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                                            Save to Wishlist
+                                            Add to Cart
                                         </button>
                                     </div>
 

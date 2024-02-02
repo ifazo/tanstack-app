@@ -9,9 +9,11 @@ import CategoriesPage from '../pages/CategoriesPage'
 import CategoryPage from '../pages/CategoryPage'
 import SignInPage from '../pages/SignInPage'
 import SignUpPage from '../pages/SignUpPage'
-import CartPage from '../pages/CartPage'
 import CheackoutPage from '../pages/CheackoutPage'
 import NotFoundPage from '../pages/NotFoundPage'
+import DashboardPage from '../pages/DashboardPage'
+import Wishlist from '../components/Wishlist'
+import Cart from '../components/Cart'
 
 const rootRoute = createRootRoute()
 
@@ -24,7 +26,8 @@ const layoutRoute = createRoute({
 
 const dashboardLayoutRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: 'dashboard',
+    id: 'dashboard-layout',
+    path: '',
     component: DashboardLayout,
 })
 
@@ -41,8 +44,8 @@ const productsRoute = createRoute({
 })
 
 const productRoute = createRoute({
-    getParentRoute: () => productsRoute,
-    path: '/$productId',
+    getParentRoute: () => layoutRoute,
+    path: '/products/$productId',
     component: ProductPage,
 })
 
@@ -53,8 +56,8 @@ const categoriesRoute = createRoute({
 })
 
 const categoryRoute = createRoute({
-    getParentRoute: () => categoriesRoute,
-    path: '/$category',
+    getParentRoute: () => layoutRoute,
+    path: '/categories/$category',
     component: CategoryPage,
 })
 
@@ -70,15 +73,27 @@ const signUpRoute = createRoute({
     component: SignUpPage,
 })
 
+const dashboardRoute = createRoute({
+    getParentRoute: () => dashboardLayoutRoute,
+    path: '/dashboard',
+    component: () => <DashboardPage />,
+})
+
+const wishlistRoute = createRoute({
+    getParentRoute: () => dashboardLayoutRoute,
+    path: '/dashboard/wishlist',
+    component: () => <Wishlist />,
+})
+
 const cartRoute = createRoute({
     getParentRoute: () => dashboardLayoutRoute,
-    path: '/cart',
-    component: CartPage,
+    path: '/dashboard/cart',
+    component: Cart,
 })
 
 const checkoutRoute = createRoute({
     getParentRoute: () => dashboardLayoutRoute,
-    path: '/checkout',
+    path: '/dashboard/checkout',
     component: CheackoutPage,
 })
 
@@ -95,6 +110,8 @@ export const routeTree = rootRoute.addChildren([
     categoryRoute,
     signInRoute,
     signUpRoute,
+    dashboardRoute,
+    wishlistRoute,
     cartRoute,
     checkoutRoute,
     layoutRoute.addChildren([dashboardLayoutRoute]),

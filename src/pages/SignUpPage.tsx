@@ -28,7 +28,7 @@ export default function SignUpPage() {
   })
 
   const googleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         queryParams: {
@@ -41,15 +41,21 @@ export default function SignUpPage() {
       toast.error(error.message)
       return
     }
+    else if (data) {
+      toast.success('Signed up with Google successfully!')
+    }
   }
 
   const githubSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
     })
     if (error) {
       toast.error(error.message)
       return
+    }
+    else if (data) {
+      toast.success('Signed up with GitHub successfully!')
     }
   }
 

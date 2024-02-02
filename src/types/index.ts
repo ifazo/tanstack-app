@@ -10,7 +10,7 @@ type Product = {
   category: string;
   thumbnail: string;
   images: string[];
-  ouantity?: number;
+  quantity?: number;
 };
 
 type Category = {

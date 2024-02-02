@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createProduct, deleteProduct, updateProduct } from "./api";
+import { createProduct, deleteProduct, updateProduct } from "./supabase";
 import { queryClient } from "../main";
 import { Product } from "../types";
 

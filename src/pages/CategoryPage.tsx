@@ -1,10 +1,10 @@
 import { Link, useParams } from "@tanstack/react-router"
-import { useProductByCategory } from "../lib/queries"
+import { useGetProductByCategory } from "../lib/queries"
 import { Product } from "../types"
 
 export default function CategoryPage() {
-    const { category } = useParams({ strict: false })
-    const { data, error } = useProductByCategory(category)
+    const { category } = useParams({ strict: false }) as { category: string }
+    const { data, error } = useGetProductByCategory(category)
     if (error) return <div>Error: {error.message}</div>
     if (!data) return <div>Loading...</div>
     const products = data.data.products
