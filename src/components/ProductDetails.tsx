@@ -8,7 +8,7 @@ function classNames(...classes: string[]) {
 }
 
 export default function ProductDetails({ product }: { product: Product }) {
-    // const createProduct = useCreateProduct()
+    
     return (
         <div className="bg-white">
             <div className="pt-6 pb-16 sm:pb-24">

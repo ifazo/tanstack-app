@@ -1,4 +1,4 @@
-import { NotFoundRoute, createRootRoute, createRoute } from '@tanstack/react-router'
+import { createRootRoute, createRoute } from '@tanstack/react-router'
 import HomePage from '../pages/HomePage'
 import { createRouter } from '@tanstack/react-router'
 import RootLayout from '../layouts/RootLayout'
@@ -76,13 +76,13 @@ const signUpRoute = createRoute({
 const dashboardRoute = createRoute({
     getParentRoute: () => dashboardLayoutRoute,
     path: '/dashboard',
-    component: () => <DashboardPage />,
+    component: DashboardPage,
 })
 
 const wishlistRoute = createRoute({
     getParentRoute: () => dashboardLayoutRoute,
     path: '/dashboard/wishlist',
-    component: () => <Wishlist />,
+    component: Wishlist
 })
 
 const cartRoute = createRoute({
@@ -97,9 +97,10 @@ const checkoutRoute = createRoute({
     component: CheackoutPage,
 })
 
-const notFoundRoute = new NotFoundRoute({
+const notFoundRoute = createRoute({
     getParentRoute: () => rootRoute,
-    component: () => <NotFoundPage />,
+    path: '*',
+    component: NotFoundPage
 })
 
 export const routeTree = rootRoute.addChildren([
@@ -115,11 +116,11 @@ export const routeTree = rootRoute.addChildren([
     cartRoute,
     checkoutRoute,
     layoutRoute.addChildren([dashboardLayoutRoute]),
+    notFoundRoute,
 ])
 
 const router = createRouter({
     routeTree,
-    notFoundRoute,
 })
 
 export default router

@@ -3,9 +3,12 @@ import { Product } from '../types';
 import store, { removeFromCart } from '../store';
 import toast from 'react-hot-toast';
 import { Link } from '@tanstack/react-router';
+import { useCreateOrder } from '../lib/mutations';
 
 export default function Cart() {
     const products = useStore(store, (state) => state.cart);
+    const user = useStore(store, (state) => state.user);
+    const order = useCreateOrder();
     const totalPrice = products.reduce((total, product) => total + product.price, 0);
     if (products.length === 0) {
         return (
@@ -104,10 +107,13 @@ export default function Cart() {
                         <div className="mt-10">
                             <button
                                 type="submit"
-                                onClick={() => toast.success('Checkout coming soon')}
+                                onClick={() => {
+                                    order.mutate({ products, user });
+                                    toast.success('Checkout coming soon')
+                                }}
                                 className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
                             >
-                                Checkout
+                                Order
                             </button>
                         </div>
 

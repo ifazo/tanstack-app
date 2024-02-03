@@ -11,6 +11,7 @@ type Product = {
   thumbnail: string;
   images: string[];
   quantity?: number;
+  user?: User;
 };
 
 type Category = {
@@ -23,10 +24,15 @@ type User = {
   name?: string;
 };
 
+type Order = {
+  products: Product[];
+  user: User;
+};
+
 type State = {
   wishlist: Product[];
   cart: Product[];
   user: User;
 };
 
-export type { Product, Category, State, User };
+export type { Product, Category, State, User,Order };

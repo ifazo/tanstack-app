@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { createProduct, deleteProduct, updateProduct } from "./supabase";
+import { createOrder, createProduct, deleteProduct, updateProduct } from "./supabase";
 import { queryClient } from "../main";
-import { Product } from "../types";
+import { Order, Product } from "../types";
 
 export function useCreateProduct() {
     return useMutation({
@@ -36,5 +36,17 @@ export function useDeleteProduct() {
         onError: (error) => {
             console.error(error);
         }
+    });
+}
+
+export function useCreateOrder() {
+    return useMutation({
+      mutationFn: (data: Order) => createOrder(data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["orders"] });
+      },
+      onError: (error) => {
+        console.error(error);
+      },
     });
 }
