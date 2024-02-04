@@ -6,6 +6,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, FunnelIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
 import Pagination from "../components/Pagination"
 import ProductCard from "../components/ProductCard"
+import Loader from "../components/Loader"
 
 const sortOptions = [
     { name: 'Most Popular', href: '#', current: true },
@@ -38,10 +39,10 @@ export default function ProductsPage() {
     };
 
     if (!categories) {
-        return <div>Categories Loading...</div>
+        return <Loader />
     }
     if (!products) {
-        return <div>Products Loading...</div>
+        return <Loader />
     }
     if (categoriesError) {
         return <div>Error: {categoriesError.message}</div>

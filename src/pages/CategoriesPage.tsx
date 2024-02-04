@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { useGetCategories } from "../lib/queries"
+import Loader from "../components/Loader"
 
 export default function CategoriesPage() {
   // const [category, setCategory] = useState<string>("")
@@ -10,7 +11,7 @@ export default function CategoriesPage() {
     return <div>{error.message}</div>
   }
   if (!data) {
-    return <div>Loading...</div>
+    return <Loader />
   }
   const categories = data.data
   return (

@@ -6,6 +6,7 @@ import { useStore } from "@tanstack/react-store";
 import store from "../store";
 import Spinner from "./Spinner";
 import { MatchRoute } from '@tanstack/react-router';
+import logo from '../assets/logo.jpg'
 
 const navigation = [
   { name: 'Home', to: '/' },
@@ -28,7 +29,7 @@ export default function Header() {
               <span className="sr-only">Your Company</span>
               <img
                 className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                src={logo}
                 alt=""
               />
             </Link>
@@ -69,7 +70,7 @@ export default function Header() {
                 <span className="sr-only">Your Company</span>
                 <img
                   className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                  src={logo}
                   alt=""
                 />
               </a>

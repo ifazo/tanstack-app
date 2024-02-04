@@ -1,12 +1,13 @@
 import { Link, useParams } from "@tanstack/react-router"
 import { useGetProductByCategory } from "../lib/queries"
 import { Product } from "../types"
+import Loader from "../components/Loader"
 
 export default function CategoryPage() {
     const { category } = useParams({ strict: false }) as { category: string }
     const { data, error } = useGetProductByCategory(category)
     if (error) return <div>Error: {error.message}</div>
-    if (!data) return <div>Loading...</div>
+    if (!data) return <Loader />
     const products = data.data.products
     return (
         <div className="bg-gray-100">

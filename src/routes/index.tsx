@@ -14,6 +14,7 @@ import NotFoundPage from '../pages/NotFoundPage'
 import DashboardPage from '../pages/DashboardPage'
 import Wishlist from '../components/Wishlist'
 import Cart from '../components/Cart'
+import BlogsPage from '../pages/BlogsPage'
 
 const rootRoute = createRootRoute()
 
@@ -59,6 +60,12 @@ const categoryRoute = createRoute({
     getParentRoute: () => layoutRoute,
     path: '/categories/$category',
     component: CategoryPage,
+})
+
+const blogsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: '/blogs',
+    component: BlogsPage,
 })
 
 const signInRoute = createRoute({
@@ -109,6 +116,7 @@ export const routeTree = rootRoute.addChildren([
     productRoute,
     categoriesRoute,
     categoryRoute,
+    blogsRoute,
     signInRoute,
     signUpRoute,
     dashboardRoute,

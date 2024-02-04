@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import logo from '../assets/logo.jpg'
 
 const navigation = [
     { name: 'Home', to: '/', icon: HomeIcon, current: true },
@@ -84,7 +85,7 @@ export default function Example() {
                                     <div className="flex-shrink-0 flex items-center px-4">
                                         <img
                                             className="h-8 w-auto"
-                                            src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
+                                            src={logo}
                                             alt="Workflow"
                                         />
                                     </div>
@@ -139,7 +140,7 @@ export default function Example() {
                             <div className="flex items-center flex-shrink-0 px-4">
                                 <img
                                     className="h-8 w-auto"
-                                    src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
+                                    src={logo}
                                     alt="Workflow"
                                 />
                             </div>
