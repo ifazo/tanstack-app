@@ -201,7 +201,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                             </div>
 
                             <div className="mt-8 border-t border-gray-200 pt-8">
-                                <h2 className="text-sm font-medium text-gray-900">Fabric &amp; Care</h2>
+                                <h2 className="text-sm font-medium text-gray-900">Rating &amp; Review</h2>
 
                                 <div className="mt-4 prose prose-sm text-gray-500">
                                     {/* <ul role="list">

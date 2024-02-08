@@ -7,6 +7,92 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+export default supabase;
+
+export const getSession = async () => {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+  else if (data) {
+    toast.success("Session retrieved successfully!");
+  }
+}
+
+
+export const signUp = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: '/',
+    },
+  });
+  if (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+  else if (data) {
+    toast.success("Account created successfully!");
+  }
+}
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+  else toast.success("Signed out successfully!");
+}
+
+export const signIn = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  if (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+  else if (data) {
+    toast.success("Signed in successfully!");
+  }
+}
+
+export const googleSignIn = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+  if (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+  else if (data) {
+    toast.success("Signed in with Google successfully!");
+  }
+}
+
+export const githubSignIn = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+  });
+  if (error) {
+    toast.error(error.message);
+    console.log(error);
+  }
+  else if (data) {
+    toast.success("Signed in with GitHub successfully!");
+  }
+}
+
 export const getProducts = async () => {
   const { data, error } = await supabase.from("products").select();
   if (error) {
@@ -114,5 +200,3 @@ export const createOrder = async (data: Order) => {
   }
   else toast.success("Order inserted successfully");
 }
-
-export default supabase;

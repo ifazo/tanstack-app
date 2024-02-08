@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import logo from '../assets/logo.jpg'
+import logo from '../assets/react.svg'
 
 export default function Footer() {
   return (
@@ -13,9 +13,9 @@ export default function Footer() {
             aria-label="Brand"
           >
             <img
-              className="w-16 h-16 rounded-full"
+              className="w-8 h-8 rounded-full"
               src={logo}
-              alt=""
+              alt="logo"
             />
           </Link>
         </div>

@@ -10,6 +10,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
-      </QueryClientProvider>
+    </QueryClientProvider>
   </React.StrictMode>,
 )
