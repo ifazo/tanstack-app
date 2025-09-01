@@ -7,6 +7,7 @@ import { ThemeProvider } from 'next-themes'
 import appCss from '../styles.css?url'
 import { Header } from '@/components/header'
 import NotFound from '@/components/not-found'
+import { Navbar } from '@/components/navbar'
 
 export const queryClient = new QueryClient()
 
@@ -52,6 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <div className="pt-16">
               <Header />
               {children}
+              <Navbar />
             </div>
             <TanstackDevtools
               config={{

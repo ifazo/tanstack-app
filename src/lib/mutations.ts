@@ -6,9 +6,10 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createUser, loginUser } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, postComment, updatePost } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
+import { Comment, Post } from "@/types";
 
 export function useSignUp() {
   return useMutation({
@@ -135,6 +136,89 @@ export function useSignOut() {
     },
     onError: (error) => {
       console.error("❌ Sign out failed:", error);
+    },
+  });
+}
+
+export function useCreatePost() {
+  return useMutation({
+    mutationFn: (data: Post) => createPost(data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("❌ Create post failed:", error);
+    },
+  });
+}
+
+export function useUpdatePost() {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<Post> }) =>
+      updatePost(id, data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("❌ Update post failed:", error);
+    },
+  });
+}
+
+export function useDeletePost() {
+  return useMutation({
+    mutationFn: (id: number) => deletePost(id).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("❌ Delete post failed:", error);
+    },
+  });
+}
+
+export function useCreateComment() {
+  return useMutation({
+    mutationFn: ({ postId, data }: { postId: number; data: Comment }) =>
+      postComment(postId, data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("❌ Create comment failed:", error);
+    },
+  });
+}
+
+export function useUpdateComment() {
+  return useMutation({
+    mutationFn: ({
+      postId,
+      commentId,
+      data,
+    }: {
+      postId: number;
+      commentId: number;
+      data: Partial<Comment>;
+    }) => editComment(postId, commentId, data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("❌ Update comment failed:", error);
+    },
+  });
+}
+
+export function useDeleteComment() {
+  return useMutation({
+    mutationFn: ({ postId, commentId }: { postId: number; commentId: number }) =>
+      deleteComment(postId, commentId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      console.error("❌ Delete comment failed:", error);
     },
   });
 }
