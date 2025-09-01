@@ -1,10 +1,14 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanstackDevtools } from '@tanstack/react-devtools'
-
-import Header from '../components/Header'
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from '@/components/ui/sonner'
+import { ThemeProvider } from 'next-themes'
 import appCss from '../styles.css?url'
+import { Header } from '@/components/header'
+import NotFound from '@/components/not-found'
+
+export const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
   head: () => ({
@@ -27,7 +31,7 @@ export const Route = createRootRoute({
       },
     ],
   }),
-
+  notFoundComponent: NotFound,
   shellComponent: RootDocument,
 })
 
@@ -38,20 +42,32 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
-        {children}
-        <TanstackDevtools
-          config={{
-            position: 'bottom-left',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryClientProvider client={queryClient}>
+            <div className="pt-16">
+              <Header />
+              {children}
+            </div>
+            <TanstackDevtools
+              config={{
+                position: 'bottom-left',
+              }}
+              plugins={[
+                {
+                  name: 'Tanstack Router',
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+              ]}
+            />
+          </QueryClientProvider>
+        </ThemeProvider>
         <Scripts />
+        <Toaster />
       </body>
     </html>
   )
