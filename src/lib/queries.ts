@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsers, getUser, getPosts, getPost } from "./api";
+import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages } from "./api";
 
 export function useGetUsers() {
   return useQuery({
@@ -28,5 +28,29 @@ export function useGetPost(id: number) {
     queryKey: ["post", id],
     queryFn: () => getPost(id).then(res => res.data),
     enabled: !!id,
+  });
+}
+
+export function useGetComments(postId: number) {
+  return useQuery({
+    queryKey: ["post", postId, "comments"],
+    queryFn: () => getComments(postId).then(res => res.data),
+    enabled: !!postId,
+  });
+}
+
+export function useUserChat(userId: number) {
+  return useQuery({
+    queryKey: ["user", userId, "chat"],
+    queryFn: () => userChat(userId).then(res => res.data),
+    enabled: !!userId,
+  });
+}
+
+export function useChatMessages(chatId: number) {
+  return useQuery({
+    queryKey: ["chat", chatId, "messages"],
+    queryFn: () => chatMessages(chatId).then(res => res.data),
+    enabled: !!chatId,
   });
 }

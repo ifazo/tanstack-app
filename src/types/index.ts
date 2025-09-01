@@ -1,3 +1,10 @@
+export type Auth = {
+    email: string;
+    password: string;
+    name: string;
+    image: string;
+}
+
 export type User = {
     email: string;
     password: string;
