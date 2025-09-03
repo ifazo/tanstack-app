@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, postComment, updatePost } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -154,7 +154,7 @@ export function useCreatePost() {
 
 export function useUpdatePost() {
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<Post> }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<Post> }) =>
       updatePost(id, data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -167,7 +167,7 @@ export function useUpdatePost() {
 
 export function useDeletePost() {
   return useMutation({
-    mutationFn: (id: number) => deletePost(id).then(res => res.data),
+    mutationFn: (id: string) => deletePost(id).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
@@ -177,10 +177,10 @@ export function useDeletePost() {
   });
 }
 
-export function useCreateComment() {
+export function useAddComment() {
   return useMutation({
-    mutationFn: ({ postId, data }: { postId: number; data: Comment }) =>
-      postComment(postId, data).then(res => res.data),
+    mutationFn: ({ postId, data }: { postId: string; data: Comment }) =>
+      addComment(postId, data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
@@ -190,15 +190,15 @@ export function useCreateComment() {
   });
 }
 
-export function useUpdateComment() {
+export function useEditComment() {
   return useMutation({
     mutationFn: ({
       postId,
       commentId,
       data,
     }: {
-      postId: number;
-      commentId: number;
+      postId: string;
+      commentId: string;
       data: Partial<Comment>;
     }) => editComment(postId, commentId, data).then(res => res.data),
     onSuccess: () => {
@@ -212,13 +212,26 @@ export function useUpdateComment() {
 
 export function useDeleteComment() {
   return useMutation({
-    mutationFn: ({ postId, commentId }: { postId: number; commentId: number }) =>
+    mutationFn: ({ postId, commentId }: { postId: string; commentId: string }) =>
       deleteComment(postId, commentId).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: (error) => {
       console.error("❌ Delete comment failed:", error);
+    },
+  });
+}
+
+export function useSendMessage() {
+  return useMutation({
+    mutationFn: ({ chatId, data }: { chatId: string; data: any }) =>
+      sendMessage(chatId, data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+    },
+    onError: (error) => {
+      console.error("❌ Send message failed:", error);
     },
   });
 }

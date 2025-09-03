@@ -8,7 +8,7 @@ export function useGetUsers() {
   });
 }
 
-export function useGetUser(id: number) {
+export function useGetUser(id: string) {
   return useQuery({
     queryKey: ["user", id],
     queryFn: () => getUser(id).then(res => res.data),
@@ -23,7 +23,7 @@ export function useGetPosts() {
   });
 }
 
-export function useGetPost(id: number) {
+export function useGetPost(id: string) {
   return useQuery({
     queryKey: ["post", id],
     queryFn: () => getPost(id).then(res => res.data),
@@ -31,7 +31,7 @@ export function useGetPost(id: number) {
   });
 }
 
-export function useGetComments(postId: number) {
+export function useGetComments(postId: string) {
   return useQuery({
     queryKey: ["post", postId, "comments"],
     queryFn: () => getComments(postId).then(res => res.data),
@@ -39,15 +39,14 @@ export function useGetComments(postId: number) {
   });
 }
 
-export function useUserChat(userId: number) {
+export function useUserChat() {
   return useQuery({
-    queryKey: ["user", userId, "chat"],
-    queryFn: () => userChat(userId).then(res => res.data),
-    enabled: !!userId,
+    queryKey: ["user", "chats"],
+    queryFn: () => userChat().then(res => res.data),
   });
 }
 
-export function useChatMessages(chatId: number) {
+export function useChatMessages(chatId: string) {
   return useQuery({
     queryKey: ["chat", chatId, "messages"],
     queryFn: () => chatMessages(chatId).then(res => res.data),

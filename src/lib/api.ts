@@ -2,7 +2,7 @@ import { getToken } from "@/store";
 import { Auth, Post, User } from "@/types";
 import axios from "axios";
 
-const baseUrl = "https://tanstack-server.vercel.app/api";
+const baseUrl = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL: baseUrl,
@@ -31,32 +31,34 @@ export const createUser = (data: Auth) =>
 
 export const getUsers = () => api.get("/users");
 
-export const getUser = (userId: number) => api.get(`/users/${userId}`);
+export const getUser = (userId: string) => api.get(`/users/${userId}`);
 
-export const updateUser = (userId: number, data: Partial<User>) => api.patch(`/users/${userId}`, data);
+export const updateUser = (userId: string, data: Partial<User>) => api.patch(`/users/${userId}`, data);
 
-export const deleteUser = (userId: number) => api.delete(`/users/${userId}`);
+export const deleteUser = (userId: string) => api.delete(`/users/${userId}`);
 
 export const getPosts = () => api.get("/posts");
 
 export const createPost = (data: Post) => api.post("/posts", data);
 
-export const getPost = (postId: number) => api.get(`/posts/${postId}`);
+export const getPost = (postId: string) => api.get(`/posts/${postId}`);
 
-export const updatePost = (postId: number, data: Partial<Post>) => api.patch(`/posts/${postId}`, data);
+export const updatePost = (postId: string, data: Partial<Post>) => api.patch(`/posts/${postId}`, data);
 
-export const deletePost = (postId: number) => api.delete(`/posts/${postId}`);
+export const deletePost = (postId: string) => api.delete(`/posts/${postId}`);
 
-export const getComments = (postId: number) => api.get(`/posts/${postId}/comments`);
+export const getComments = (postId: string) => api.get(`/posts/${postId}/comments`);
 
-export const addComment = (postId: number, data: any) => api.post(`/posts/${postId}/comments`, data);
+export const addComment = (postId: string, data: any) => api.post(`/posts/${postId}/comments`, data);
 
-export const editComment = (postId: number, commentId: number, data: any) => api.patch(`/posts/${postId}/comments/${commentId}`, data);
+export const editComment = (postId: string, commentId: string, data: any) => api.patch(`/posts/${postId}/comments/${commentId}`, data);
 
-export const deleteComment = (postId: number, commentId: number) => api.delete(`/posts/${postId}/comments/${commentId}`);
+export const deleteComment = (postId: string, commentId: string) => api.delete(`/posts/${postId}/comments/${commentId}`);
 
-export const userChat = (userId: number) => api.get(`/user/${userId}/chat`);
+export const userChat = () => api.get(`/chats/user`);
 
-export const chatMessages = (chatId: number) => api.get(`/chat/${chatId}/messages`);
+export const chatMessages = (chatId: string) => api.get(`/chats/${chatId}/messages`);
+
+export const sendMessage = (chatId: string, data: any) => api.post(`/chats/${chatId}/messages`, data);
 
 export default api;
