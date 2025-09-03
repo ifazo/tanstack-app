@@ -12,7 +12,7 @@ import {
   Home,
   Compass,
   MessageCircle,
-  Settings,
+  Users2,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
@@ -29,10 +29,10 @@ import { Link, useRouterState } from '@tanstack/react-router'
 
 const navItems = [
   { name: 'Home', icon: Home, to: '/' },
-  { name: 'Explore', icon: Compass, to: '/explore' },
+  { name: 'Video', icon: Compass, to: '/video' },
   { name: 'Chat', icon: MessageCircle, to: '/chat' },
+  { name: 'Friends', icon: Users2, to: '/friends' },
   { name: 'Profile', icon: User, to: '/profile' },
-  { name: 'Settings', icon: Settings, to: '/settings' },
 ]
 
 export function Header() {
@@ -140,7 +140,7 @@ export function Header() {
               <Link to="/login" className="flex items-center space-x-2">
                 <Button variant="outline" size="sm">
                   <LogIn className="h-4 w-4" />
-                  <span className="hidden sm:inline">Login</span>
+                  {/* <span className="hidden sm:inline">Login</span> */}
                 </Button>
               </Link>
             )}

@@ -7,10 +7,10 @@ import { Link, useRouterState } from '@tanstack/react-router'
 
 const navItems = [
   { name: 'Home', icon: Home, to: '/' },
-  { name: 'Explore', icon: Compass, to: '/explore' },
+  { name: 'Video', icon: Compass, to: '/video' },
   { name: 'Chat', icon: MessageCircle, to: '/chat' },
+  { name: 'Friends', icon: Settings, to: '/friends' },
   { name: 'Profile', icon: User, to: '/profile' },
-  { name: 'Settings', icon: Settings, to: '/settings' },
 ]
 
 export function Navbar() {
