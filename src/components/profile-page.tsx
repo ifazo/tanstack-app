@@ -5,8 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Edit,
@@ -17,10 +15,11 @@ import {
   Bookmark,
   Share2,
   MoreHorizontal,
-  UserPlus,
   Edit3,
   CornerUpRight,
   AtSign,
+  TvMinimalPlay,
+  Eye,
 } from 'lucide-react'
 
 // Mock data for the profile
@@ -41,80 +40,6 @@ const profileData = {
     groupsCount: 28,
     postsCount: 156,
   },
-  friends: [
-    {
-      id: '1',
-      name: 'Alex Chen',
-      avatar: '/thoughtful-man.png',
-      isOnline: true,
-      mutualFriends: 12,
-    },
-    {
-      id: '2',
-      name: 'Maria Garcia',
-      avatar: '/diverse-woman-portrait.png',
-      isOnline: false,
-      mutualFriends: 8,
-    },
-    {
-      id: '3',
-      name: 'David Kim',
-      avatar: '/thoughtful-man.png',
-      isOnline: true,
-      mutualFriends: 15,
-    },
-    {
-      id: '4',
-      name: 'Emma Wilson',
-      avatar: '/diverse-woman-portrait.png',
-      isOnline: false,
-      mutualFriends: 6,
-    },
-    {
-      id: '5',
-      name: 'James Rodriguez',
-      avatar: '/thoughtful-man.png',
-      isOnline: true,
-      mutualFriends: 9,
-    },
-    {
-      id: '6',
-      name: 'Lisa Thompson',
-      avatar: '/diverse-woman-portrait.png',
-      isOnline: false,
-      mutualFriends: 11,
-    },
-  ],
-  groups: [
-    {
-      id: '1',
-      name: 'UX Designers Network',
-      members: 1240,
-      avatar: '/diverse-group-meeting.png',
-      isJoined: true,
-    },
-    {
-      id: '2',
-      name: 'San Francisco Tech',
-      members: 856,
-      avatar: '/diverse-family-portrait.png',
-      isJoined: true,
-    },
-    {
-      id: '3',
-      name: 'Coffee Lovers United',
-      members: 2341,
-      avatar: '/diverse-group-meeting.png',
-      isJoined: true,
-    },
-    {
-      id: '4',
-      name: 'Travel Photography',
-      members: 567,
-      avatar: '/diverse-family-portrait.png',
-      isJoined: true,
-    },
-  ],
   posts: [
     {
       id: '1',
@@ -144,10 +69,16 @@ const profileData = {
       shares: 15,
     },
   ],
+  videos: [
+    { id: '1', title: 'Design Thinking Workshop', thumbnail: '/video-thumb1.png', url: '#', length: '15:30', author: 'Sarah Johnson', views: 1200, like: 120, comment: 30, share: 10, createdAt: '2023-10-01' },
+    { id: '2', title: 'UI/UX Trends 2024', thumbnail: '/video-thumb2.png', url: '#', length: '10:45', author: 'Sarah Johnson', views: 980, like: 95, comment: 20, share: 5, createdAt: '2023-09-15' },
+    { id: '3', title: 'Prototyping with Figma', thumbnail: '/video-thumb3.png', url: '#', length: '12:20', author: 'Sarah Johnson', views: 1500, like: 150, comment: 40, share: 12, createdAt: '2023-08-30' },
+    { id: '4', title: 'User Research Basics', thumbnail: '/video-thumb4.png', url: '#', length: '08:50', author: 'Sarah Johnson', views: 800, like: 80, comment: 15, share: 3, createdAt: '2023-07-20' },
+  ],
 }
 
 export function ProfilePage() {
-  const [activeTab, setActiveTab] = useState('friends')
+  const [activeTab, setActiveTab] = useState('posts')
   const [isEditing, setIsEditing] = useState(false)
   const [editedBio, setEditedBio] = useState(profileData.user.bio)
 
@@ -273,24 +204,18 @@ export function ProfilePage() {
       {/* Content Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6">
-            <TabsTrigger
-              value="friends"
-              className="flex items-center justify-center gap-2 text-sm"
-            >
-              <UserPlus className="w-4 h-4" /> Friends
-            </TabsTrigger>
-            <TabsTrigger
-              value="groups"
-              className="flex items-center justify-center gap-2 text-sm"
-            >
-              <UserPlus className="w-4 h-4" /> Groups
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6 mb-6">
             <TabsTrigger
               value="posts"
               className="flex items-center justify-center gap-2 text-sm"
             >
               <Edit3 className="w-4 h-4" /> Posts
+            </TabsTrigger>
+            <TabsTrigger
+              value="videos"
+              className="flex items-center justify-center gap-2 text-sm"
+            >
+              <TvMinimalPlay className="w-4 h-4" /> Videos
             </TabsTrigger>
             <TabsTrigger
               value="likes"
@@ -317,99 +242,6 @@ export function ProfilePage() {
               <Share2 className="w-4 h-4" /> Shared
             </TabsTrigger>
           </TabsList>
-
-          {/* Friends Tab */}
-          <TabsContent value="friends" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">
-                Friends ({profileData.friends.length})
-              </h2>
-              <Input placeholder="Search friends..." className="max-w-xs" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {profileData.friends.map((friend) => (
-                <Card
-                  key={friend.id}
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={friend.avatar || '/placeholder.svg'}
-                            alt={friend.name}
-                          />
-                          <AvatarFallback>
-                            {friend.name
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        {friend.isOnline && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium truncate">{friend.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {friend.mutualFriends} mutual friends
-                        </p>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <MessageSquare className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Groups Tab */}
-          <TabsContent value="groups" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">
-                Groups ({profileData.groups.length})
-              </h2>
-              <Input placeholder="Search groups..." className="max-w-xs" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profileData.groups.map((group) => (
-                <Card
-                  key={group.id}
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={group.avatar || '/placeholder.svg'}
-                          alt={group.name}
-                        />
-                        <AvatarFallback>
-                          {group.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium truncate">{group.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {group.members.toLocaleString()} members
-                        </p>
-                      </div>
-                      <Badge variant={group.isJoined ? 'default' : 'outline'}>
-                        {group.isJoined ? 'Joined' : 'Join'}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
 
           {/* Posts Tab */}
           <TabsContent value="posts" className="space-y-4">
@@ -478,6 +310,63 @@ export function ProfilePage() {
                         <Share2 className="w-4 h-4 mr-2" />
                         {post.shares}
                       </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Videos Tab */}
+          <TabsContent value="videos" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">
+                Videos ({profileData.videos.length})
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {profileData.videos.map((video) => (
+                <Card
+                  key={video.id}
+                  className="hover:shadow-md transition-shadow"
+                >
+                  <CardContent className="p-0">
+                    <a href={video.url} className="block relative group">
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="w-full h-48 object-cover group-hover:opacity-90 transition-opacity"
+                      />
+                      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                        {video.length}
+                      </div>
+                    </a>
+                    <div className="p-4">
+                      <h3 className="font-medium mb-1">{video.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Upload at: {video.createdAt}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>
+                          <Eye className="w-4 h-4 inline-block mr-1 mb-1" />
+                          {video.views.toLocaleString()}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          <Heart className="w-4 h-4 inline-block mr-1 mb-1" />
+                          {video.like}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          <MessageSquare className="w-4 h-4 inline-block mr-1 mb-1" />
+                          {video.comment}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          <Share2 className="w-4 h-4 inline-block mr-1 mb-1" />
+                          {video.share}
+                        </span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

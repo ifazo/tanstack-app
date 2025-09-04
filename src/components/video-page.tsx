@@ -14,11 +14,12 @@ import {
   MessageCircle,
   Share2,
   Bookmark,
-  MoreHorizontal,
   TrendingUp,
   Clock,
   Users,
   Upload,
+  Eye,
+  BadgeCheck,
 } from "lucide-react"
 
 interface Video {
@@ -168,39 +169,39 @@ export function VideoPage() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="border-b border-border bg-card p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-foreground">Videos</h1>
-            <Button variant="outline" size="sm">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="bg-card rounded-2xl shadow-sm border p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Video Gallery</h1>
+              {/* <p className="text-muted-foreground mt-1">Discover {filteredVideos.length} amazing videos</p> */}
+            </div>
+            <Button className="shadow-lg hover:shadow-xl transition-all duration-300">
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Video
             </Button>
           </div>
 
-          {/* Search Bar */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <div className="relative mb-6">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
             <Input
               placeholder="Search videos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-12 h-12 rounded-xl"
             />
           </div>
 
-          {/* Category Filters */}
           <ScrollArea className="w-full">
-            <div className="flex gap-2 pb-2">
+            <div className="flex gap-3 pb-2">
               {categories.map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap rounded-xl transition-all duration-200"
                 >
                   {category === "Trending" && <TrendingUp className="h-3 w-3 mr-1" />}
                   {category === "Recent" && <Clock className="h-3 w-3 mr-1" />}
@@ -212,122 +213,100 @@ export function VideoPage() {
           </ScrollArea>
         </div>
 
-        {/* Video Grid */}
-        <ScrollArea className="flex-1">
-          <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredVideos.map((video) => (
-                <Card
-                  key={video.id}
-                  className="group cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
-                >
-                  <CardContent className="p-0">
-                    {/* Video Thumbnail */}
-                    <div className="relative">
-                      <img
-                        src={video.thumbnail || "/placeholder.svg"}
-                        alt={video.title}
-                        className="w-full h-48 object-cover rounded-t-lg"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 rounded-t-lg flex items-center justify-center">
-                        <Play className="h-12 w-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      </div>
-                      <Badge variant="secondary" className="absolute bottom-2 right-2 text-xs">
-                        {video.duration}
-                      </Badge>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredVideos.map((video) => (
+            <Card
+              key={video.id}
+              className="group bg-card border hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden cursor-pointer"
+            >
+              <CardContent className="p-0">
+                <div className="relative aspect-video bg-muted">
+                  <img
+                    src={video.thumbnail || "/placeholder.svg"}
+                    alt={video.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
+                      <Play className="w-6 h-6 text-muted-foreground ml-1" />
                     </div>
+                  </div>
+                  <Badge className="absolute bottom-3 right-3 bg-black/80 text-white border-0 rounded-lg">
+                    {video.duration}
+                  </Badge>
+                </div>
 
-                    {/* Video Info */}
-                    <div className="p-3">
-                      <div className="flex items-start gap-3">
-                        <Avatar className="h-8 w-8 flex-shrink-0">
-                          <AvatarImage src={video.author.avatar || "/placeholder.svg"} />
-                          <AvatarFallback>{video.author.name[0]}</AvatarFallback>
-                        </Avatar>
+                <div className="p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <Avatar className="h-10 w-10 flex-shrink-0 ring-2 ring-muted">
+                      <AvatarImage src={video.author.avatar || "/placeholder.svg"} />
+                      <AvatarFallback className="bg-muted text-muted-foreground">{video.author.name[0]}</AvatarFallback>
+                    </Avatar>
 
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-sm text-foreground line-clamp-2 mb-1">{video.title}</h3>
-                          <div className="flex items-center gap-1 mb-1">
-                            <span className="text-xs text-muted-foreground">{video.author.name}</span>
-                            {video.author.verified && (
-                              <div className="h-3 w-3 bg-primary rounded-full flex items-center justify-center">
-                                <div className="h-1.5 w-1.5 bg-primary-foreground rounded-full" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>{video.views} views</span>
-                            <span>•</span>
-                            <span>{video.uploadedAt}</span>
-                          </div>
-                        </div>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground line-clamp-2 mb-2 text-base leading-snug transition-colors duration-200">
+                        {video.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm text-muted-foreground font-medium truncate">{video.author.name}</span>
+                        {video.author.verified && <BadgeCheck className="h-4 w-4 text-blue-500" />}
                       </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-border">
-                        <div className="flex items-center gap-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleLike(video.id)
-                            }}
-                            className="h-8 px-2 text-muted-foreground hover:text-primary"
-                          >
-                            <Heart className="h-4 w-4 mr-1" />
-                            <span className="text-xs">{video.likes}</span>
-                          </Button>
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 px-2 text-muted-foreground hover:text-primary"
-                          >
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            <span className="text-xs">{video.comments}</span>
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
-                          >
-                            <Share2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
-                          >
-                            <Bookmark className="h-4 w-4" />
-                          </Button>
-                        </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Eye className="h-3 w-3" />
+                        <span>{video.views} views</span>
+                        <span>•</span>
+                        <span>{video.uploadedAt}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
 
-            {filteredVideos.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-muted-foreground mb-2">No videos found</div>
-                <div className="text-sm text-muted-foreground">Try adjusting your search or filters</div>
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleLike(video.id)
+                        }}
+                        className="h-9 px-3 rounded-lg transition-colors"
+                      >
+                        <Heart className="h-4 w-4 mr-1 text-red-500" />
+                        <span className="text-sm font-medium">{video.likes.toLocaleString()}</span>
+                      </Button>
+                        <span>•</span>
+                      <Button variant="ghost" size="sm" className="h-9 px-3 rounded-lg transition-colors">
+                        <MessageCircle className="h-4 w-4 mr-1" />
+                        <span className="text-sm font-medium">{video.comments}</span>
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg transition-colors">
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg transition-colors">
+                        <Bookmark className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredVideos.length === 0 && (
+          <div className="bg-card rounded-2xl shadow-sm border p-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-muted-foreground" />
               </div>
-            )}
+              <h3 className="text-xl font-semibold text-foreground mb-2">No videos found</h3>
+              <p className="text-muted-foreground">Try adjusting your search terms or filters</p>
+            </div>
           </div>
-        </ScrollArea>
+        )}
       </div>
     </div>
   )

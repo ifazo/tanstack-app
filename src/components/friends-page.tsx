@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, UserPlus, MessageCircle, Check, X, Users, UserCheck, Edit3 } from "lucide-react"
+import { Search, UserPlus, MessageCircle, Check, X, Users, UserCheck, Edit3, Globe } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -36,6 +36,12 @@ const suggestions = [
   { id: 2, name: "Tom Anderson", avatar: "/thoughtful-man.png", mutualFriends: 7, reason: "Mutual friends" },
   { id: 3, name: "Maria Garcia", avatar: "/diverse-woman-portrait.png", mutualFriends: 9, reason: "Same university" },
   { id: 4, name: "Chris Lee", avatar: "/thoughtful-man.png", mutualFriends: 4, reason: "Lives nearby" },
+]
+
+const groups = [
+  { id: 1, name: "Gaming Buddies", avatar: "/group-avatar1.png", members: 24 },
+  { id: 2, name: "Book Club", avatar: "/group-avatar2.png", members: 15 },
+  { id: 3, name: "Hiking Enthusiasts", avatar: "/group-avatar3.png", members: 30 },
 ]
 
 export function FriendsPage() {
@@ -104,12 +110,13 @@ export function FriendsPage() {
                 <UserPlus className="h-4 w-4" />
                 Suggestions
               </TabsTrigger>
-              <TabsTrigger value="online" className="flex items-center gap-2">
+              <TabsTrigger value="groups" className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-accent"></div>
-                Online
-                <Badge variant="secondary" className="ml-1">
+                <Globe className="h-4 w-4" />
+                Groups
+                {/* <Badge variant="secondary" className="ml-1">
                   {friends.filter((f) => f.status === "online").length}
-                </Badge>
+                </Badge> */}
               </TabsTrigger>
             </TabsList>
 
@@ -237,40 +244,38 @@ export function FriendsPage() {
               </ScrollArea>
             </TabsContent>
 
-            {/* Online Friends */}
-            <TabsContent value="online" className="h-full">
+            {/* Friends groups */}
+            <TabsContent value="groups" className="h-full">
               <ScrollArea className="h-full">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {friends
-                    .filter((friend) => friend.status === "online")
-                    .map((friend) => (
-                      <Card key={friend.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-4">
-                            <div className="relative">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src={friend.avatar || "/placeholder.svg"} alt={friend.name} />
-                                <AvatarFallback>
-                                  {friend.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background bg-accent"></div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-foreground truncate">{friend.name}</p>
-                              <p className="text-sm text-accent">Active now</p>
-                            </div>
+                  {groups.map((group) => (
+                    <Card key={group.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="text-center">
+                          <Avatar className="h-16 w-16 mx-auto mb-3">
+                            <AvatarImage src={group.avatar || "/placeholder.svg"} alt={group.name} />
+                            <AvatarFallback>
+                              {group.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <p className="font-medium text-foreground mb-1">{group.name}</p>
+                          <p className="text-sm text-muted-foreground mb-4">{group.members} members</p>
+                          <div className="flex gap-2">
+                            <Button size="sm" className="flex-1">
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              View Group
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              Leave
+                            </Button>
                           </div>
-                          <Button size="sm" className="w-full mt-4">
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            Send Message
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </ScrollArea>
             </TabsContent>

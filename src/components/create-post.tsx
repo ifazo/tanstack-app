@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ImageIcon, VideoIcon, SmileIcon } from "lucide-react"
+import { ImageIcon, Tag, AtSign } from "lucide-react"
 
 export function CreatePost() {
   const [content, setContent] = useState("")
@@ -39,16 +39,16 @@ export function CreatePost() {
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               <Button variant="ghost" size="sm" type="button" className="text-muted-foreground hover:text-primary">
-                <ImageIcon className="w-4 h-4 mr-1" />
+                <ImageIcon className="w-4 h-4" />
                 Photo
               </Button>
               <Button variant="ghost" size="sm" type="button" className="text-muted-foreground hover:text-primary">
-                <VideoIcon className="w-4 h-4 mr-1" />
-                Video
+                <AtSign className="w-4 h-4" />
+                Mension
               </Button>
               <Button variant="ghost" size="sm" type="button" className="text-muted-foreground hover:text-primary">
-                <SmileIcon className="w-4 h-4 mr-1" />
-                Feeling
+                <Tag className="w-4 h-4" />
+                Tag
               </Button>
             </div>
 

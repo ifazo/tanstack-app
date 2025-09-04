@@ -1,4 +1,5 @@
 import { CreatePost } from '@/components/create-post'
+import { HomeStories } from '@/components/home-stories'
 import { PostFeed } from '@/components/post-feed'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -16,6 +17,7 @@ function App() {
             Stay connected with your friends and community
           </p>
         </div>
+        <HomeStories />
         <CreatePost />
         <PostFeed />
       </div>
