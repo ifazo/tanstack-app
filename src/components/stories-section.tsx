@@ -73,7 +73,7 @@ const mockStories: Story[] = [
   },
 ]
 
-export function HomeStories() {
+export function StoriesSection() {
   return (
     <div className="mb-6">
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">

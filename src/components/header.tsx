@@ -8,11 +8,11 @@ import {
   Moon,
   LogIn,
   LogOut,
-  User,
   Home,
   Compass,
   MessageCircle,
   Users2,
+  User2,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
@@ -32,7 +32,7 @@ const navItems = [
   { name: 'Video', icon: Compass, to: '/video' },
   { name: 'Chat', icon: MessageCircle, to: '/chat' },
   { name: 'Friends', icon: Users2, to: '/friends' },
-  { name: 'Profile', icon: User, to: '/profile' },
+  { name: 'Profile', icon: User2, to: '/profile' },
 ]
 
 export function Header() {
@@ -53,7 +53,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/20 backdrop-blur-md border-b border-border/40">
+      <header className="fixed top-1 left-2 right-2 z-50 bg-background/20 backdrop-blur-md border-b border-border/40 rounded-2xl">
         <div className="max-w-screen-xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
           {/* Left group: logo, divider, nav */}
           <div className="flex items-center space-x-3">
@@ -125,7 +125,7 @@ export function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="w-9 h-9">
-                    <User className="h-4 w-4" />
+                    <User2 className="h-4 w-4" />
                     <span className="sr-only">User menu</span>
                   </Button>
                 </DropdownMenuTrigger>

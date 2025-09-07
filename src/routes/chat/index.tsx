@@ -16,16 +16,6 @@ function RouteComponent() {
   return (
     <div>
       <ChatPage />
-      {/* <h1>Chats</h1>
-      <ul>
-        {data.chats.map((chat: any) => (
-          <li key={chat._id}>
-            <Link to="/chat/$chatId" params={{ chatId: chat._id }}>
-              {chat.name}
-            </Link>
-          </li>
-        ))}
-      </ul> */}
     </div>
   )
 }

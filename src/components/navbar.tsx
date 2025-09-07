@@ -2,15 +2,15 @@
 
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Home, Compass, MessageCircle, User, Settings } from 'lucide-react'
+import { Home, Compass, MessageCircle, User2, Users2 } from 'lucide-react'
 import { Link, useRouterState } from '@tanstack/react-router'
 
 const navItems = [
   { name: 'Home', icon: Home, to: '/' },
   { name: 'Video', icon: Compass, to: '/video' },
   { name: 'Chat', icon: MessageCircle, to: '/chat' },
-  { name: 'Friends', icon: Settings, to: '/friends' },
-  { name: 'Profile', icon: User, to: '/profile' },
+  { name: 'Friends', icon: Users2, to: '/friends' },
+  { name: 'Profile', icon: User2, to: '/profile' },
 ]
 
 export function Navbar() {
@@ -18,8 +18,8 @@ export function Navbar() {
 
   return (
     <div className="relative sm:hidden">
-      <div className="fixed bottom-2 left-0 right-0 flex justify-center z-50">
-        <Card className="w-full max-w-lg flex justify-around items-center py-2 rounded-2xl shadow-lg bg-background/20 backdrop-blur-md border">
+      <div className="fixed bottom-1 left-2 right-2 flex justify-center z-50">
+        <Card className="w-full flex justify-around items-center py-2 rounded-2xl shadow-lg bg-background/20 backdrop-blur-md border">
           <nav className="flex items-center justify-around w-full">
             {navItems.map((item) => {
               const isActive = location.pathname === item.to

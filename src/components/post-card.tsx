@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -15,7 +15,7 @@ interface Post {
     avatar: string
   }
   content: string
-  image?: string
+  images: string[]
   timestamp: string
   likes: number
   comments: number
@@ -30,10 +30,21 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked)
   const [likesCount, setLikesCount] = useState(post.likes)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const handleLike = () => {
     setIsLiked(!isLiked)
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
+  }
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const scrollLeft = scrollContainerRef.current.scrollLeft
+      const imageWidth = scrollContainerRef.current.clientWidth
+      const newIndex = Math.round(scrollLeft / imageWidth)
+      setCurrentImageIndex(newIndex)
+    }
   }
 
   return (
@@ -62,13 +73,85 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Post Image */}
-        {post.image && (
-          <div className="px-4 pb-3">
-            <img
-              src={post.image || "/placeholder.svg"}
-              alt="Post content"
-              className="w-full rounded-lg object-cover max-h-96"
-            />
+        {post.images && post.images.length > 0 && (
+          <div className="relative">
+            <div
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+              onScroll={handleScroll}
+              style={{ scrollBehavior: "smooth" }}
+            >
+              {post.images.map((image, index) => (
+                <div key={index} className="flex-shrink-0 w-full snap-start">
+                  <img
+                    src={image || "/placeholder.svg"}
+                    alt={`Post image ${index + 1}`}
+                    className="w-full h-96 object-cover select-none"
+                    draggable={false}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {post.images?.length > 1 && (
+              <>
+                <button
+                  onClick={() => {
+                    if (scrollContainerRef.current) {
+                      const newIndex = Math.max(0, currentImageIndex - 1)
+                      scrollContainerRef.current.scrollTo({
+                        left: newIndex * scrollContainerRef.current.clientWidth,
+                        behavior: "smooth",
+                      })
+                    }
+                  }}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                  style={{ display: currentImageIndex > 0 ? "block" : "none" }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (scrollContainerRef.current) {
+                      const newIndex = Math.min(post.images.length - 1, currentImageIndex + 1)
+                      scrollContainerRef.current.scrollTo({
+                        left: newIndex * scrollContainerRef.current.clientWidth,
+                        behavior: "smooth",
+                      })
+                    }
+                  }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                  style={{ display: currentImageIndex < post.images.length - 1 ? "block" : "none" }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {post.images.length > 1 && (
+              <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                {currentImageIndex + 1}/{post.images.length}
+              </div>
+            )}
+
+            {post.images.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1">
+                {post.images.map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-colors",
+                      index === currentImageIndex ? "bg-white" : "bg-white/50",
+                    )}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
