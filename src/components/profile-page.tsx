@@ -5,7 +5,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   Edit,
   MapPin,
@@ -15,23 +30,88 @@ import {
   Bookmark,
   Share2,
   MoreHorizontal,
+  Save,
+  X,
+  Copy,
+  Check,
   Edit3,
-  CornerUpRight,
-  AtSign,
   TvMinimalPlay,
   Eye,
+  AtSign,
+  Earth,
 } from 'lucide-react'
+
+const countries = [
+  'United States',
+  'Canada',
+  'United Kingdom',
+  'Germany',
+  'France',
+  'Italy',
+  'Spain',
+  'Australia',
+  'Japan',
+  'South Korea',
+  'China',
+  'India',
+  'Brazil',
+  'Mexico',
+  'Argentina',
+  'Netherlands',
+  'Sweden',
+  'Norway',
+  'Denmark',
+  'Finland',
+  'Switzerland',
+  'Austria',
+  'Belgium',
+  'Portugal',
+  'Ireland',
+  'New Zealand',
+  'Singapore',
+  'Malaysia',
+  'Thailand',
+  'Philippines',
+  'Indonesia',
+  'Vietnam',
+  'Turkey',
+  'Greece',
+  'Poland',
+  'Czech Republic',
+  'Hungary',
+  'Romania',
+  'Bulgaria',
+  'Croatia',
+  'Slovenia',
+  'Slovakia',
+  'Estonia',
+  'Latvia',
+  'Lithuania',
+  'Ukraine',
+  'Russia',
+  'South Africa',
+  'Egypt',
+  'Morocco',
+  'Nigeria',
+  'Kenya',
+  'Ghana',
+  'Israel',
+  'UAE',
+  'Saudi Arabia',
+]
 
 // Mock data for the profile
 const profileData = {
   user: {
     id: '1',
-    name: 'Sarah Johnsony',
-    username: 'sarah.johnson',
+    name: 'Sarah Johnson',
+    username: '@sarah.johnson',
+    slug: 'sarah-johnson',
     bio: 'UX Designer passionate about creating meaningful digital experiences. Coffee enthusiast ☕ | Travel lover 🌍',
     avatar: '/diverse-woman-portrait.png',
     coverImage: '/abstract-gradient.png',
     location: 'San Francisco, CA',
+    country: 'United States',
     joinDate: 'March 2020',
     email: 'sarah.johnson@example.com',
     phone: '+1 (555) 123-4567',
@@ -40,6 +120,80 @@ const profileData = {
     groupsCount: 28,
     postsCount: 156,
   },
+  friends: [
+    {
+      id: '1',
+      name: 'Alex Chen',
+      avatar: '/thoughtful-man.png',
+      isOnline: true,
+      mutualFriends: 12,
+    },
+    {
+      id: '2',
+      name: 'Maria Garcia',
+      avatar: '/diverse-woman-portrait.png',
+      isOnline: false,
+      mutualFriends: 8,
+    },
+    {
+      id: '3',
+      name: 'David Kim',
+      avatar: '/thoughtful-man.png',
+      isOnline: true,
+      mutualFriends: 15,
+    },
+    {
+      id: '4',
+      name: 'Emma Wilson',
+      avatar: '/diverse-woman-portrait.png',
+      isOnline: false,
+      mutualFriends: 6,
+    },
+    {
+      id: '5',
+      name: 'James Rodriguez',
+      avatar: '/thoughtful-man.png',
+      isOnline: true,
+      mutualFriends: 9,
+    },
+    {
+      id: '6',
+      name: 'Lisa Thompson',
+      avatar: '/diverse-woman-portrait.png',
+      isOnline: false,
+      mutualFriends: 11,
+    },
+  ],
+  groups: [
+    {
+      id: '1',
+      name: 'UX Designers Network',
+      members: 1240,
+      avatar: '/diverse-group-meeting.png',
+      isJoined: true,
+    },
+    {
+      id: '2',
+      name: 'San Francisco Tech',
+      members: 856,
+      avatar: '/diverse-family-portrait.png',
+      isJoined: true,
+    },
+    {
+      id: '3',
+      name: 'Coffee Lovers United',
+      members: 2341,
+      avatar: '/diverse-group-meeting.png',
+      isJoined: true,
+    },
+    {
+      id: '4',
+      name: 'Travel Photography',
+      members: 567,
+      avatar: '/diverse-family-portrait.png',
+      isJoined: true,
+    },
+  ],
   posts: [
     {
       id: '1',
@@ -70,21 +224,138 @@ const profileData = {
     },
   ],
   videos: [
-    { id: '1', title: 'Design Thinking Workshop', thumbnail: '/video-thumb1.png', url: '#', length: '15:30', author: 'Sarah Johnson', views: 1200, like: 120, comment: 30, share: 10, createdAt: '2023-10-01' },
-    { id: '2', title: 'UI/UX Trends 2024', thumbnail: '/video-thumb2.png', url: '#', length: '10:45', author: 'Sarah Johnson', views: 980, like: 95, comment: 20, share: 5, createdAt: '2023-09-15' },
-    { id: '3', title: 'Prototyping with Figma', thumbnail: '/video-thumb3.png', url: '#', length: '12:20', author: 'Sarah Johnson', views: 1500, like: 150, comment: 40, share: 12, createdAt: '2023-08-30' },
-    { id: '4', title: 'User Research Basics', thumbnail: '/video-thumb4.png', url: '#', length: '08:50', author: 'Sarah Johnson', views: 800, like: 80, comment: 15, share: 3, createdAt: '2023-07-20' },
+    {
+      id: '1',
+      title: 'Design Thinking Workshop',
+      thumbnail: '/video-thumb1.png',
+      url: '#',
+      length: '15:30',
+      author: 'Sarah Johnson',
+      views: 1200,
+      like: 120,
+      comment: 30,
+      share: 10,
+      createdAt: '2023-10-01',
+    },
+    {
+      id: '2',
+      title: 'UI/UX Trends 2024',
+      thumbnail: '/video-thumb2.png',
+      url: '#',
+      length: '10:45',
+      author: 'Sarah Johnson',
+      views: 980,
+      like: 95,
+      comment: 20,
+      share: 5,
+      createdAt: '2023-09-15',
+    },
+    {
+      id: '3',
+      title: 'Prototyping with Figma',
+      thumbnail: '/video-thumb3.png',
+      url: '#',
+      length: '12:20',
+      author: 'Sarah Johnson',
+      views: 1500,
+      like: 150,
+      comment: 40,
+      share: 12,
+      createdAt: '2023-08-30',
+    },
+    {
+      id: '4',
+      title: 'User Research Basics',
+      thumbnail: '/video-thumb4.png',
+      url: '#',
+      length: '08:50',
+      author: 'Sarah Johnson',
+      views: 800,
+      like: 80,
+      comment: 15,
+      share: 3,
+      createdAt: '2023-07-20',
+    },
   ],
 }
 
 export function ProfilePage() {
   const [activeTab, setActiveTab] = useState('posts')
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedBio, setEditedBio] = useState(profileData.user.bio)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [isLinkCopied, setIsLinkCopied] = useState(false)
+  const [editedProfile, setEditedProfile] = useState({
+    name: profileData.user.name,
+    slug: profileData.user.slug,
+    bio: profileData.user.bio,
+    location: profileData.user.location,
+    country: profileData.user.country,
+  })
 
-  const handleSaveBio = () => {
+  const [isGettingLocation, setIsGettingLocation] = useState(false)
+
+  const getDeviceLocation = () => {
+    setIsGettingLocation(true)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            // Use reverse geocoding to get location name
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`,
+            )
+            const data = await response.json()
+            const locationString = `${data.city}, ${data.principalSubdivision}`
+
+            setEditedProfile((prev) => ({
+              ...prev,
+              location: locationString,
+              country: data.countryName,
+            }))
+          } catch (error) {
+            console.error('Error getting location:', error)
+          } finally {
+            setIsGettingLocation(false)
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error)
+          setIsGettingLocation(false)
+        },
+      )
+    } else {
+      setIsGettingLocation(false)
+      alert('Geolocation is not supported by this browser.')
+    }
+  }
+
+  const handleSaveProfile = () => {
     // Here you would typically save to backend
-    setIsEditing(false)
+    console.log('Saving profile:', editedProfile)
+    setIsEditDialogOpen(false)
+  }
+
+  const handleCancelEdit = () => {
+    // Reset to original values
+    setEditedProfile({
+      name: profileData.user.name,
+      slug: profileData.user.slug,
+      bio: profileData.user.bio,
+      location: profileData.user.location,
+      country: profileData.user.country,
+    })
+    setIsEditDialogOpen(false)
+  }
+
+  const copyProfileLink = async () => {
+    const profileLink = `${window.location.origin}/profile/${editedProfile.slug}`
+    try {
+      await navigator.clipboard.writeText(profileLink)
+      setIsLinkCopied(true)
+      setTimeout(() => setIsLinkCopied(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy link:', error)
+    }
   }
 
   return (
@@ -94,7 +365,8 @@ export function ProfilePage() {
         {/* Cover Image */}
         <div className="h-48 bg-gradient-to-r from-primary/20 to-secondary/20 relative">
           <img
-            src={profileData.user.coverImage}
+            src={profileData.user.coverImage || '/placeholder.svg'}
+            alt="Cover"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -107,10 +379,10 @@ export function ProfilePage() {
               <Avatar className="w-32 h-32 border-4 border-background shadow-lg">
                 <AvatarImage
                   src={profileData.user.avatar || '/placeholder.svg'}
-                  alt={profileData.user.name}
+                  alt={editedProfile.name}
                 />
                 <AvatarFallback className="text-2xl font-semibold">
-                  {profileData.user.name
+                  {editedProfile.name
                     .split(' ')
                     .map((n) => n[0])
                     .join('')}
@@ -118,20 +390,22 @@ export function ProfilePage() {
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-4">
-                  <h1 className="text-3xl font-bold text-foreground">
-                    {profileData.user.name}
+                  <h1 className="text-2xl font-bold text-foreground mb-3">
+                    {editedProfile.name}
                   </h1>
-                </div>
 
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
                     <AtSign className="w-4 h-4" />
-                    {profileData.user.username}
+                    {editedProfile.slug}
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
-                    {profileData.user.location}
+                    {editedProfile.location}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Earth className="w-4 h-4" />
+                    {editedProfile.country}
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
@@ -154,49 +428,203 @@ export function ProfilePage() {
             </div>
 
             <div className="flex gap-2 mt-4 sm:mt-0">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
+              <Dialog
+                open={isEditDialogOpen}
+                onOpenChange={setIsEditDialogOpen}
               >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Profile
-              </Button>
-              <Button variant="outline" size="sm">
-                <CornerUpRight className="w-4 h-4 mr-2" />
-                Share Profile
-              </Button>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Edit Profile</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Name</label>
+                        <Input
+                          value={editedProfile.name}
+                          onChange={(e) =>
+                            setEditedProfile((prev) => ({
+                              ...prev,
+                              name: e.target.value,
+                            }))
+                          }
+                          placeholder="Enter your name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Username</label>
+                        <Input
+                          value={editedProfile.slug}
+                          onChange={(e) =>
+                            setEditedProfile((prev) => ({
+                              ...prev,
+                              slug: e.target.value,
+                            }))
+                          }
+                          placeholder="Enter username"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Location</label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={editedProfile.location}
+                          readOnly
+                          placeholder="Location will be detected automatically"
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={getDeviceLocation}
+                          disabled={isGettingLocation}
+                        >
+                          {isGettingLocation ? 'Getting...' : 'Detect Location'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Country</label>
+                      <Select
+                        value={editedProfile.country}
+                        onValueChange={(value) =>
+                          setEditedProfile((prev) => ({
+                            ...prev,
+                            country: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Bio</label>
+                      <Textarea
+                        value={editedProfile.bio}
+                        onChange={(e) =>
+                          setEditedProfile((prev) => ({
+                            ...prev,
+                            bio: e.target.value,
+                          }))
+                        }
+                        placeholder="Tell us about yourself..."
+                        className="min-h-[80px]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-4">
+                      <Button onClick={handleSaveProfile} className="w-full">
+                        <Save className="w-4 h-4" />
+                        Save Changes
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleCancelEdit}
+                        className="w-full"
+                      >
+                        <X className="w-4 h-4" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog
+                open={isShareDialogOpen}
+                onOpenChange={setIsShareDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share Profile
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Share Profile</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="flex items-center gap-3 p-4 border rounded-lg">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage
+                          src={profileData.user.avatar || '/placeholder.svg'}
+                          alt={editedProfile.name}
+                        />
+                        <AvatarFallback>
+                          {editedProfile.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium truncate">
+                          {editedProfile.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          @{editedProfile.slug}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {editedProfile.location}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Profile Link
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${editedProfile.slug}`}
+                          readOnly
+                          className="flex-1"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={copyProfileLink}
+                          className="flex-shrink-0 bg-transparent"
+                        >
+                          {isLinkCopied ? (
+                            <Check className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
-          {/* Bio Section */}
           <div className="mt-6">
-            {isEditing ? (
-              <div className="space-y-3">
-                <Textarea
-                  value={editedBio}
-                  onChange={(e) => setEditedBio(e.target.value)}
-                  placeholder="Tell us about yourself..."
-                  className="min-h-[80px]"
-                />
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={handleSaveBio}>
-                    Save
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <p className="text-foreground leading-relaxed">
-                {profileData.user.bio}
-              </p>
-            )}
+            <p className="text-foreground leading-relaxed">
+              {editedProfile.bio}
+            </p>
           </div>
         </div>
       </div>
