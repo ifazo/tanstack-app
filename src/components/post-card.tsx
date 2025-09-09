@@ -16,6 +16,8 @@ interface Post {
   }
   content: string
   images: string[]
+  mentions?: string[]
+  tags?: string[]
   timestamp: string
   likes: number
   comments: number
@@ -70,6 +72,26 @@ export function PostCard({ post }: PostCardProps) {
         {/* Post Content */}
         <div className="px-4 pb-3">
           <p className="text-card-foreground text-sm leading-relaxed">{post.content}</p>
+          {(post.mentions && post.mentions.length > 0) || (post.tags && post.tags.length > 0) ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {post.mentions?.map((mention, index) => (
+                <span
+                  key={`mention-${index}`}
+                  className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium"
+                >
+                  @{mention}
+                </span>
+              ))}
+              {post.tags?.map((tag, index) => (
+                <span
+                  key={`tag-${index}`}
+                  className="text-green-600 hover:text-green-800 cursor-pointer text-sm font-medium"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* Post Image */}
@@ -93,7 +115,7 @@ export function PostCard({ post }: PostCardProps) {
               ))}
             </div>
 
-            {post.images?.length > 1 && (
+            {post.images.length > 1 && (
               <>
                 <button
                   onClick={() => {

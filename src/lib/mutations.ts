@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -232,6 +232,45 @@ export function useSendMessage() {
     },
     onError: (error) => {
       console.error("❌ Send message failed:", error);
+    },
+  });
+}
+
+export function useSendFriendRequest() {
+  return useMutation({
+    mutationFn: (userId: string) => sendFriendRequest(userId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
+      queryClient.invalidateQueries({ queryKey: ["friends", "suggestions"] });
+    },
+    onError: (error) => {
+      console.error("❌ Send friend request failed:", error);
+    },
+  });
+}
+
+export function useAcceptFriendRequest() {
+  return useMutation({
+    mutationFn: (requestId: string) => acceptFriendRequest(requestId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+    },
+    onError: (error) => {
+      console.error("❌ Accept friend request failed:", error);
+    },
+  });
+}
+
+export function useDeclineFriendRequest() {
+  return useMutation({
+    mutationFn: (requestId: string) => declineFriendRequest(requestId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
+      queryClient.invalidateQueries({ queryKey: ["friends", "suggestions"] });
+    },
+    onError: (error) => {
+      console.error("❌ Decline friend request failed:", error);
     },
   });
 }

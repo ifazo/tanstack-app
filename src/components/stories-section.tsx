@@ -93,7 +93,7 @@ export function StoriesSection() {
                   <Plus className="w-3 h-3" />
                 </Button>
               </div>
-              <span className="text-xs font-medium text-center leading-tight">Your Story</span>
+              <span className="text-xs font-medium text-center leading-tight text-foreground">Your Story</span>
             </div>
           </Card>
         </div>
@@ -103,7 +103,7 @@ export function StoriesSection() {
           <div key={story.id} className="flex-shrink-0">
             <Card className="relative w-20 h-28 bg-gradient-to-b from-primary/10 to-primary/5 border-0 overflow-hidden cursor-pointer hover:scale-105 transition-transform">
               <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${story.avatar})` }}>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
               </div>
 
               <div className="relative h-full flex flex-col justify-between p-2">
@@ -119,7 +119,14 @@ export function StoriesSection() {
                 </div>
 
                 <div className="text-center">
-                  <span className="text-xs font-medium text-white drop-shadow-sm leading-tight">{story.username}</span>
+                  <div className="bg-black/40 rounded-md px-1 py-0.5 backdrop-blur-sm">
+                    <span
+                      className="text-xs font-medium text-white leading-tight"
+                      style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+                    >
+                      {story.username}
+                    </span>
+                  </div>
                 </div>
               </div>
             </Card>

@@ -61,4 +61,16 @@ export const chatMessages = (chatId: string) => api.get(`/chats/${chatId}/messag
 
 export const sendMessage = (chatId: string, data: any) => api.post(`/chats/${chatId}/messages`, data);
 
+export const getFriends = () => api.get(`/friends`);
+
+export const getFriendRequests = () => api.get(`/friends/requests`);
+
+export const getFriendSuggestions = () => api.get(`/friends/suggestions`);
+
+export const sendFriendRequest = (userId: string) => api.post(`/friends/requests?toUserId=${userId}`);
+
+export const acceptFriendRequest = (requestId: string) => api.post(`/friends/requests/${requestId}/accept`);
+
+export const declineFriendRequest = (requestId: string) => api.post(`/friends/requests/${requestId}/decline`);
+
 export default api;
