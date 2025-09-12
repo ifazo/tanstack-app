@@ -112,7 +112,7 @@ export function StoriesSection() {
                     className={`p-0.5 rounded-full ${story.hasNewStory ? "bg-gradient-to-r from-pink-500 to-orange-500" : "bg-muted-foreground/30"}`}
                   >
                     <Avatar className="w-10 h-10 border-2 border-background">
-                      <AvatarImage src={story.avatar || "/placeholder.svg"} />
+                      <AvatarImage src={story.avatar} />
                       <AvatarFallback>{story.username[0].toUpperCase()}</AvatarFallback>
                     </Avatar>
                   </div>

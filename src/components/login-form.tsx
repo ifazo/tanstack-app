@@ -36,13 +36,13 @@ export function LoginForm({
     onSubmit: async ({ value }) => {
       // showLoading('Loading...', 'Please wait while processing.')
       signInWithEmail.mutate(value, {
-        onSuccess: (res) => {
-          console.log('✅ Logged in:', res)
+        onSuccess: () => {
+          // console.log('✅ Logged in:', res)
           showSuccess('Login successful!', 'Welcome back!')
           navigate({ to: '/' })
         },
         onError: (err) => {
-          console.error('❌ Login failed:', err)
+          // console.error('❌ Login failed:', err)
           showError('Login failed', `Error: ${err.message || 'Unknown error'}`)
         },
       })

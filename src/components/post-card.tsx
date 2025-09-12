@@ -1,43 +1,75 @@
-"use client"
+'use client'
 
-import { useState, useRef } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share, MoreHorizontal } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState, useRef, useEffect } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { MessageCircle, Share, MoreHorizontal, ThumbsUp } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { timeAgo } from '@/lib/time'
+import { ReactionsPopup, ReactionType } from './reactions-popup'
+import { PostRes } from '@/types'
+import { useGetPostReactionByUser } from '@/lib/queries'
+import { useAddReaction, useRemoveReaction } from '@/lib/mutations'
+import { getUser } from '@/store'
+import { useToast } from '@/hooks/useToast'
 
-interface Post {
-  id: string
-  user: {
-    name: string
-    username: string
-    avatar: string
-  }
-  content: string
-  images: string[]
-  mentions?: string[]
-  tags?: string[]
-  timestamp: string
-  likes: number
-  comments: number
-  shares: number
-  isLiked: boolean
+const reactionEmojis: Record<ReactionType, string> = {
+  like: '👍',
+  love: '❤️',
+  haha: '😂',
+  wow: '😮',
+  sad: '😢',
+  angry: '😡',
 }
 
-interface PostCardProps {
-  post: Post
-}
+export function PostCard({ post }: { post: PostRes }) {
+  const { showWarning } = useToast()
+  const currentUser = getUser()
+  const addReactionMutation = useAddReaction()
+  const removeReactionMutation = useRemoveReaction()
 
-export function PostCard({ post }: PostCardProps) {
-  const [isLiked, setIsLiked] = useState(post.isLiked)
-  const [likesCount, setLikesCount] = useState(post.likes)
+  const user = post?.user || { name: 'Unknown', image: '' }
+
+  const { data } = useGetPostReactionByUser(post._id)
+  const userReact = data?.react ?? null
+
+  const [userReaction, setUserReaction] = useState<ReactionType | null>(
+    (userReact as ReactionType) ?? null,
+  )
+  const [totalReactions, setTotalReactions] = useState(post.reactionsCount)
+
+  useEffect(() => {
+    setUserReaction((userReact as ReactionType) ?? null)
+    setTotalReactions(post.reactionsCount)
+  }, [data])
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [showReactions, setShowReactions] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const reactionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleLike = () => {
-    setIsLiked(!isLiked)
-    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
+  const handleReaction = (reactionType: ReactionType) => {
+    if (!currentUser) {
+      showWarning("Not logged in", "Please log in to react post!")
+      return
+    }
+
+    if (reactionType === userReaction) {
+      setUserReaction(null)
+      removeReactionMutation.mutate(post._id)
+    } else {
+      setUserReaction(reactionType)
+      addReactionMutation.mutate({ postId: post._id, react: reactionType })
+    }
+  }
+
+  const handleReactionClick = () => {
+    if (userReaction) {
+      handleReaction(userReaction)
+    } else {
+      handleReaction('like')
+    }
   }
 
   const handleScroll = () => {
@@ -53,38 +85,51 @@ export function PostCard({ post }: PostCardProps) {
     <Card className="bg-card border-border hover:shadow-md transition-shadow duration-200">
       <CardContent className="p-0">
         {/* Post Header */}
-        <div className="flex items-center justify-between p-4 pb-3">
+        <div className="flex items-center justify-between px-4 pb-3">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={post.user.avatar || "/placeholder.svg"} />
-              <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={user.image} />
+              <AvatarFallback>
+                {(user.name && user.name.charAt(0)) || '?'}
+              </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-card-foreground text-sm">{post.user.name}</h3>
-              <p className="text-muted-foreground text-xs">{post.timestamp}</p>
+              <h3 className="font-semibold text-card-foreground text-sm">
+                {user.name || 'Unknown'}
+              </h3>
+              <p className="text-muted-foreground text-xs">
+                {timeAgo(post.createdAt)}
+              </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Post Content */}
         <div className="px-4 pb-3">
-          <p className="text-card-foreground text-sm leading-relaxed">{post.content}</p>
-          {(post.mentions && post.mentions.length > 0) || (post.tags && post.tags.length > 0) ? (
+          <p className="text-card-foreground text-sm leading-relaxed">
+            {post.text}
+          </p>
+          {(post?.mentions && post.mentions.length > 0) ||
+          (post.tags && post.tags.length > 0) ? (
             <div className="mt-3 flex flex-wrap gap-2">
-              {post.mentions?.map((mention, index) => (
+              {post.mentions?.map((mention: string) => (
                 <span
-                  key={`mention-${index}`}
+                  key={mention}
                   className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium"
                 >
                   @{mention}
                 </span>
               ))}
-              {post.tags?.map((tag, index) => (
+              {post.tags?.map((tag: string) => (
                 <span
-                  key={`tag-${index}`}
+                  key={tag}
                   className="text-green-600 hover:text-green-800 cursor-pointer text-sm font-medium"
                 >
                   #{tag}
@@ -95,18 +140,18 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Post Image */}
-        {post.images && post.images.length > 0 && (
+        {post?.images && post.images.length > 0 && (
           <div className="relative">
             <div
               ref={scrollContainerRef}
               className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
               onScroll={handleScroll}
-              style={{ scrollBehavior: "smooth" }}
+              style={{ scrollBehavior: 'smooth' }}
             >
-              {post.images.map((image, index) => (
+              {post.images?.map((image, index) => (
                 <div key={index} className="flex-shrink-0 w-full snap-start">
                   <img
-                    src={image || "/placeholder.svg"}
+                    src={image || '/placeholder.svg'}
                     alt={`Post image ${index + 1}`}
                     className="w-full h-96 object-cover select-none"
                     draggable={false}
@@ -123,33 +168,61 @@ export function PostCard({ post }: PostCardProps) {
                       const newIndex = Math.max(0, currentImageIndex - 1)
                       scrollContainerRef.current.scrollTo({
                         left: newIndex * scrollContainerRef.current.clientWidth,
-                        behavior: "smooth",
+                        behavior: 'smooth',
                       })
                     }
                   }}
                   className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-                  style={{ display: currentImageIndex > 0 ? "block" : "none" }}
+                  style={{ display: currentImageIndex > 0 ? 'block' : 'none' }}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
                 </button>
 
                 <button
                   onClick={() => {
                     if (scrollContainerRef.current) {
-                      const newIndex = Math.min(post.images.length - 1, currentImageIndex + 1)
+                      const newIndex = Math.min(
+                        post.images.length - 1,
+                        currentImageIndex + 1,
+                      )
                       scrollContainerRef.current.scrollTo({
                         left: newIndex * scrollContainerRef.current.clientWidth,
-                        behavior: "smooth",
+                        behavior: 'smooth',
                       })
                     }
                   }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-                  style={{ display: currentImageIndex < post.images.length - 1 ? "block" : "none" }}
+                  style={{
+                    display:
+                      currentImageIndex < post.images.length - 1
+                        ? 'block'
+                        : 'none',
+                  }}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
               </>
@@ -163,12 +236,12 @@ export function PostCard({ post }: PostCardProps) {
 
             {post.images.length > 1 && (
               <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1">
-                {post.images.map((_, index) => (
+                {post.images?.map((_: any, index: number) => (
                   <div
                     key={index}
                     className={cn(
-                      "w-2 h-2 rounded-full transition-colors",
-                      index === currentImageIndex ? "bg-white" : "bg-white/50",
+                      'w-2 h-2 rounded-full transition-colors',
+                      index === currentImageIndex ? 'bg-white' : 'bg-white/50',
                     )}
                   />
                 ))}
@@ -177,38 +250,79 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         )}
 
-        {/* Engagement Stats */}
-        <div className="px-4 py-2 border-t border-border">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{likesCount} likes</span>
-            <div className="flex gap-4">
-              <span>{post.comments} comments</span>
-              <span>{post.shares} shares</span>
-            </div>
-          </div>
-        </div>
-
         {/* Action Buttons */}
-        <div className="flex items-center justify-around p-2 border-t border-border">
+        <div className="flex items-center justify-around pt-2 px-3 border-t border-border">
+          <div
+            className="relative flex-1"
+            onMouseEnter={() => {
+              if (reactionTimeoutRef.current) {
+                clearTimeout(reactionTimeoutRef.current)
+              }
+              reactionTimeoutRef.current = setTimeout(() => {
+                setShowReactions(true)
+              }, 500)
+            }}
+            onMouseLeave={() => {
+              if (reactionTimeoutRef.current) {
+                clearTimeout(reactionTimeoutRef.current)
+              }
+              reactionTimeoutRef.current = setTimeout(() => {
+                setShowReactions(false)
+              }, 100)
+            }}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReactionClick}
+              className={cn(
+                'w-full gap-2 text-muted-foreground hover:text-primary',
+                userReaction && 'text-blue-500 hover:text-blue-600',
+              )}
+            >
+              {userReaction ? (
+                <span className="text-base">
+                  {reactionEmojis[userReaction]}
+                </span>
+              ) : (
+                <ThumbsUp className="w-4 h-4" />
+              )}
+              {userReaction
+                ? userReaction.charAt(0).toUpperCase() + userReaction.slice(1)
+                : 'Like'}
+
+              {totalReactions > 0 && (
+                <span className="text-sm bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
+                  {totalReactions}
+                </span>
+              )}
+            </Button>
+
+            <ReactionsPopup
+              isVisible={showReactions}
+              onReactionSelect={handleReaction}
+            />
+          </div>
+
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleLike}
-            className={cn(
-              "flex-1 gap-2 text-muted-foreground hover:text-primary",
-              isLiked && "text-red-500 hover:text-red-600",
-            )}
+            className="flex-1 gap-2 text-muted-foreground hover:text-primary"
           >
-            <Heart className={cn("w-4 h-4", isLiked && "fill-current")} />
-            Like
-          </Button>
-
-          <Button variant="ghost" size="sm" className="flex-1 gap-2 text-muted-foreground hover:text-primary">
             <MessageCircle className="w-4 h-4" />
             Comment
+            {post.commentsCount > 0 && (
+              <span className="text-sm bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
+                {post.commentsCount}
+              </span>
+            )}
           </Button>
 
-          <Button variant="ghost" size="sm" className="flex-1 gap-2 text-muted-foreground hover:text-primary">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 gap-2 text-muted-foreground hover:text-primary"
+          >
             <Share className="w-4 h-4" />
             Share
           </Button>

@@ -239,7 +239,7 @@ export function VideoPage() {
                 <div className="p-5">
                   <div className="flex items-start gap-3 mb-4">
                     <Avatar className="h-10 w-10 flex-shrink-0 ring-2 ring-muted">
-                      <AvatarImage src={video.author.avatar || "/placeholder.svg"} />
+                      <AvatarImage src={video.author.avatar} />
                       <AvatarFallback className="bg-muted text-muted-foreground">{video.author.name[0]}</AvatarFallback>
                     </Avatar>
 

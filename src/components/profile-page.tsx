@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,66 +39,8 @@ import {
   Eye,
   AtSign,
   Earth,
+  Loader,
 } from 'lucide-react'
-
-const countries = [
-  'United States',
-  'Canada',
-  'United Kingdom',
-  'Germany',
-  'France',
-  'Italy',
-  'Spain',
-  'Australia',
-  'Japan',
-  'South Korea',
-  'China',
-  'India',
-  'Brazil',
-  'Mexico',
-  'Argentina',
-  'Netherlands',
-  'Sweden',
-  'Norway',
-  'Denmark',
-  'Finland',
-  'Switzerland',
-  'Austria',
-  'Belgium',
-  'Portugal',
-  'Ireland',
-  'New Zealand',
-  'Singapore',
-  'Malaysia',
-  'Thailand',
-  'Philippines',
-  'Indonesia',
-  'Vietnam',
-  'Turkey',
-  'Greece',
-  'Poland',
-  'Czech Republic',
-  'Hungary',
-  'Romania',
-  'Bulgaria',
-  'Croatia',
-  'Slovenia',
-  'Slovakia',
-  'Estonia',
-  'Latvia',
-  'Lithuania',
-  'Ukraine',
-  'Russia',
-  'South Africa',
-  'Egypt',
-  'Morocco',
-  'Nigeria',
-  'Kenya',
-  'Ghana',
-  'Israel',
-  'UAE',
-  'Saudi Arabia',
-]
 
 // Mock data for the profile
 const profileData = {
@@ -108,7 +50,7 @@ const profileData = {
     username: '@sarah.johnson',
     slug: 'sarah-johnson',
     bio: 'UX Designer passionate about creating meaningful digital experiences. Coffee enthusiast ☕ | Travel lover 🌍',
-    avatar: '/diverse-woman-portrait.png',
+    image: '/diverse-woman-portrait.png',
     coverImage: '/abstract-gradient.png',
     location: 'San Francisco, CA',
     country: 'United States',
@@ -116,9 +58,9 @@ const profileData = {
     email: 'sarah.johnson@example.com',
     phone: '+1 (555) 123-4567',
     isOnline: true,
-    friendsCount: 342,
-    groupsCount: 28,
-    postsCount: 156,
+    followersCount: 232,
+    friendsCount: 42,
+    likesCount: 968,
   },
   friends: [
     {
@@ -288,11 +230,63 @@ export function ProfilePage() {
     name: profileData.user.name,
     slug: profileData.user.slug,
     bio: profileData.user.bio,
-    location: profileData.user.location,
-    country: profileData.user.country,
+    location: profileData.user.location || 'Unknown',
+    country: profileData.user.country || 'Unknown',
+    phone: profileData.user.phone.replace(/^\+\d+\s/, ''), // Remove country code from display
+    phoneCountryCode: '+1', // Default to US
   })
 
   const [isGettingLocation, setIsGettingLocation] = useState(false)
+  const [countries, setCountries] = useState<any[]>([])
+  const [phoneCountries, setPhoneCountries] = useState<any[]>([])
+  const [isLoadingCountries, setIsLoadingCountries] = useState(false)
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      setIsLoadingCountries(true)
+      try {
+        const response = await fetch('/countries.json')
+        const data = await response.json()
+
+        const formattedCountriesByName = data
+          .filter(
+            (country: any) =>
+              country.idd?.root && country.idd?.suffixes?.length > 0,
+          )
+          .map((country: any) => ({
+            name: country.name.common,
+            flag: country.flags.svg,
+            code: country.cca2,
+            dialCode: country.idd.root + (country.idd.suffixes[0] || ''),
+          }))
+          .sort((a: { name: string }, b: { name: string }) =>
+            a.name.localeCompare(b.name),
+          )
+
+        const formattedCountriesByDialCode = formattedCountriesByName
+          .filter((c: any) => c.dialCode)
+          .sort((a: any, b: any) => {
+            const aNum =
+              parseInt(String(a.dialCode).replace(/\D/g, ''), 10) || 0
+            const bNum =
+              parseInt(String(b.dialCode).replace(/\D/g, ''), 10) || 0
+            if (aNum === bNum) return a.name.localeCompare(b.name)
+            return aNum - bNum
+          })
+
+        setCountries(formattedCountriesByName)
+        setPhoneCountries(formattedCountriesByDialCode)
+      } catch (error) {
+        console.error('Error loading countries.json:', error)
+        setCountries([])
+        setPhoneCountries([])
+      } finally {
+        setIsLoadingCountries(false)
+      }
+    }
+
+    fetchCountries()
+  }, [])
 
   const getDeviceLocation = () => {
     setIsGettingLocation(true)
@@ -309,11 +303,15 @@ export function ProfilePage() {
 
             setEditedProfile((prev) => ({
               ...prev,
-              location: locationString,
+              location: locationString || 'Unknown', // Fallback to "Unknown"
               country: data.countryName,
             }))
           } catch (error) {
             console.error('Error getting location:', error)
+            setEditedProfile((prev) => ({
+              ...prev,
+              location: 'Unknown',
+            }))
           } finally {
             setIsGettingLocation(false)
           }
@@ -321,6 +319,10 @@ export function ProfilePage() {
         (error) => {
           console.error('Error getting location:', error)
           setIsGettingLocation(false)
+          setEditedProfile((prev) => ({
+            ...prev,
+            location: 'Unknown',
+          }))
         },
       )
     } else {
@@ -331,7 +333,7 @@ export function ProfilePage() {
 
   const handleSaveProfile = () => {
     // Here you would typically save to backend
-    console.log('Saving profile:', editedProfile)
+    // console.log('Saving profile:', editedProfile)
     setIsEditDialogOpen(false)
   }
 
@@ -341,8 +343,10 @@ export function ProfilePage() {
       name: profileData.user.name,
       slug: profileData.user.slug,
       bio: profileData.user.bio,
-      location: profileData.user.location,
+      location: 'Unknown', // Reset to "Unknown"
       country: profileData.user.country,
+      phone: profileData.user.phone.replace(/^\+\d+\s/, ''),
+      phoneCountryCode: '+1',
     })
     setIsEditDialogOpen(false)
   }
@@ -378,7 +382,7 @@ export function ProfilePage() {
             <div className="flex flex-col sm:flex-row sm:items-end gap-4">
               <Avatar className="w-32 h-32 border-4 border-background shadow-lg">
                 <AvatarImage
-                  src={profileData.user.avatar || '/placeholder.svg'}
+                  src={profileData.user.image}
                   alt={editedProfile.name}
                 />
                 <AvatarFallback className="text-2xl font-semibold">
@@ -390,9 +394,9 @@ export function ProfilePage() {
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl font-bold text-foreground mb-3">
-                    {editedProfile.name}
-                  </h1>
+                <h1 className="text-2xl font-bold text-foreground mb-3">
+                  {editedProfile.name}
+                </h1>
 
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
@@ -418,10 +422,10 @@ export function ProfilePage() {
                     <strong>{profileData.user.friendsCount}</strong> Friends
                   </span>
                   <span>
-                    <strong>{profileData.user.groupsCount}</strong> Groups
+                    <strong>{profileData.user.followersCount}</strong> Followers
                   </span>
                   <span>
-                    <strong>{profileData.user.postsCount}</strong> Posts
+                    <strong>{profileData.user.likesCount}</strong> Likes
                   </span>
                 </div>
               </div>
@@ -473,48 +477,127 @@ export function ProfilePage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Location</label>
+                      <label className="text-sm font-medium">
+                        Phone Number
+                      </label>
                       <div className="flex gap-2">
+                        <Select
+                          value={editedProfile.phoneCountryCode}
+                          onValueChange={(value) =>
+                            setEditedProfile((prev) => ({
+                              ...prev,
+                              phoneCountryCode: value,
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue placeholder="Code" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {isLoadingCountries ? (
+                              <SelectItem value="loading" disabled>
+                                <Loader className="w-4 h-4 animate-spin mr-2" />{' '}
+                                Loading...
+                              </SelectItem>
+                            ) : (
+                              phoneCountries.map((country) => (
+                                <SelectItem
+                                  key={country.code}
+                                  value={country.dialCode}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <img
+                                      src={country.flag}
+                                      className="w-6 h-4"
+                                    />
+                                    <span>{country.dialCode}</span>
+                                    <span className="text-sm text-muted-foreground">
+                                      {country.name}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          value={editedProfile.phone}
+                          onChange={(e) =>
+                            setEditedProfile((prev) => ({
+                              ...prev,
+                              phone: e.target.value,
+                            }))
+                          }
+                          placeholder="Enter phone number"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Location</label>
                         <Input
                           value={editedProfile.location}
                           readOnly
                           placeholder="Location will be detected automatically"
                           className="flex-1"
                         />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={getDeviceLocation}
-                          disabled={isGettingLocation}
-                        >
-                          {isGettingLocation ? 'Getting...' : 'Detect Location'}
-                        </Button>
                       </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Country</label>
-                      <Select
-                        value={editedProfile.country}
-                        onValueChange={(value) =>
-                          setEditedProfile((prev) => ({
-                            ...prev,
-                            country: value,
-                          }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countries.map((country) => (
-                            <SelectItem key={country} value={country}>
-                              {country}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Country</label>
+                        <div className="flex gap-2">
+                          <Select
+                            value={editedProfile.country}
+                            onValueChange={(value) =>
+                              setEditedProfile((prev) => ({
+                                ...prev,
+                                country: value,
+                              }))
+                            }
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {isLoadingCountries ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading countries...
+                                </SelectItem>
+                              ) : (
+                                countries.map((country) => (
+                                  <SelectItem
+                                    key={country.code}
+                                    value={country.name}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <img
+                                        src={country.flag}
+                                        alt={country.name}
+                                        className="w-6 h-4"
+                                      />
+                                      <span>{country.name}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={getDeviceLocation}
+                            disabled={isGettingLocation}
+                          >
+                            {isGettingLocation ? (
+                              <Loader className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <MapPin className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="space-y-2">
@@ -568,7 +651,7 @@ export function ProfilePage() {
                     <div className="flex items-center gap-3 p-4 border rounded-lg">
                       <Avatar className="w-12 h-12">
                         <AvatarImage
-                          src={profileData.user.avatar || '/placeholder.svg'}
+                          src={profileData.user.image}
                           alt={editedProfile.name}
                         />
                         <AvatarFallback>
@@ -608,12 +691,17 @@ export function ProfilePage() {
                           className="flex-shrink-0 bg-transparent"
                         >
                           {isLinkCopied ? (
-                            <Check className="w-4 h-4 text-primary" />
+                            <Check className="w-4 h-4" />
                           ) : (
                             <Copy className="w-4 h-4" />
                           )}
                         </Button>
                       </div>
+                      {isLinkCopied && (
+                        <p className="text-sm text-green-600">
+                          Link copied to clipboard!
+                        </p>
+                      )}
                     </div>
                   </div>
                 </DialogContent>
@@ -632,7 +720,7 @@ export function ProfilePage() {
       {/* Content Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger
               value="posts"
               className="flex items-center justify-center gap-2 text-sm"
@@ -663,12 +751,6 @@ export function ProfilePage() {
             >
               <Bookmark className="w-4 h-4" /> Saved
             </TabsTrigger>
-            <TabsTrigger
-              value="shares"
-              className="flex items-center justify-center gap-2 text-sm"
-            >
-              <Share2 className="w-4 h-4" /> Shared
-            </TabsTrigger>
           </TabsList>
 
           {/* Posts Tab */}
@@ -685,7 +767,7 @@ export function ProfilePage() {
                     <div className="flex items-start gap-3 mb-4">
                       <Avatar className="w-10 h-10">
                         <AvatarImage
-                          src={profileData.user.avatar || '/placeholder.svg'}
+                          src={profileData.user.image}
                           alt={profileData.user.name}
                         />
                         <AvatarFallback>
@@ -846,22 +928,6 @@ export function ProfilePage() {
               <CardContent>
                 <p className="text-muted-foreground">
                   Posts you've saved will appear here.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="shares" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Share2 className="w-5 h-5 text-green-500" />
-                  Shared Posts
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Posts you've shared will appear here.
                 </p>
               </CardContent>
             </Card>

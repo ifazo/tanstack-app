@@ -130,7 +130,7 @@ export function FriendsPage() {
                         <div className="flex items-center space-x-4">
                           <div className="relative">
                             <Avatar className="h-12 w-12">
-                              <AvatarImage src={friend.avatar || "/placeholder.svg"} alt={friend.name} />
+                              <AvatarImage src={friend.avatar} />
                               <AvatarFallback>
                                 {friend.name
                                   .split(" ")
@@ -173,7 +173,7 @@ export function FriendsPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
                             <Avatar className="h-12 w-12">
-                              <AvatarImage src={request.avatar || "/placeholder.svg"} alt={request.name} />
+                              <AvatarImage src={request.avatar} />
                               <AvatarFallback>
                                 {request.name
                                   .split(" ")
@@ -214,7 +214,7 @@ export function FriendsPage() {
                       <CardContent className="p-4">
                         <div className="text-center">
                           <Avatar className="h-16 w-16 mx-auto mb-3">
-                            <AvatarImage src={suggestion.avatar || "/placeholder.svg"} alt={suggestion.name} />
+                            <AvatarImage src={suggestion.avatar} />
                             <AvatarFallback>
                               {suggestion.name
                                 .split(" ")
@@ -253,7 +253,7 @@ export function FriendsPage() {
                       <CardContent className="p-4">
                         <div className="text-center">
                           <Avatar className="h-16 w-16 mx-auto mb-3">
-                            <AvatarImage src={group.avatar || "/placeholder.svg"} alt={group.name} />
+                            <AvatarImage src={group.avatar} />
                             <AvatarFallback>
                               {group.name
                                 .split(" ")

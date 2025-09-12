@@ -124,7 +124,7 @@ export function Header() {
             {user?.email ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9">
+                  <Button variant="outline" size="icon" className="w-9 h-9">
                     <User2 className="h-4 w-4" />
                     <span className="sr-only">User menu</span>
                   </Button>
@@ -140,7 +140,7 @@ export function Header() {
               <Link to="/login" className="flex items-center space-x-2">
                 <Button variant="outline" size="sm">
                   <LogIn className="h-4 w-4" />
-                  {/* <span className="hidden sm:inline">Login</span> */}
+                  <span className="hidden sm:inline">Login</span>
                 </Button>
               </Link>
             )}

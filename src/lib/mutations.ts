@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -173,6 +173,33 @@ export function useDeletePost() {
     },
     onError: (error) => {
       console.error("❌ Delete post failed:", error);
+    },
+  });
+}
+
+export function useAddReaction() {
+  return useMutation({
+    mutationFn: ({ postId, react }: { postId: string; react: string }) =>
+      addReaction(postId, react).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["user", "reactions"] });
+    },
+    onError: (error) => {
+      console.error("❌ Add reaction failed:", error);
+    },
+  });
+}
+
+export function useRemoveReaction() {
+  return useMutation({
+    mutationFn: (postId: string) => removeReaction(postId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["user", "reactions"] });
+    },
+    onError: (error) => {
+      console.error("❌ Remove reaction failed:", error);
     },
   });
 }

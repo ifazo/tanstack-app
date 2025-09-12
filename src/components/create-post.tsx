@@ -1,46 +1,113 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ImageIcon, AtSign, Hash, X } from "lucide-react"
-import { MentionPopup } from "./mention-popup"
-import { TagPopup } from "./tag-popup"
+import type React from 'react'
+import { useState, useRef } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ImageIcon, AtSign, Hash, X } from 'lucide-react'
+import { MentionPopup } from './mention-popup'
+import { TagPopup } from './tag-popup'
+import { useCreatePost } from '@/lib/mutations'
+import { useToast } from '@/hooks/useToast'
+import { getUser } from '@/store'
 
 export function CreatePost() {
-  const [content, setContent] = useState("")
-  const [photos, setPhotos] = useState<string[]>([])
+  const user = getUser()
+  const { showSuccess, showError, showWarning, showLoading } = useToast()
+  const createPost = useCreatePost()
+
+  const [text, setText] = useState('')
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [imageFiles, setImageFiles] = useState<File[]>([])
   const [mentions, setMentions] = useState<string[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [showMentionPopup, setShowMentionPopup] = useState(false)
   const [showTagPopup, setShowTagPopup] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY as string
+
+  const uploadImage = async (file: File) => {
+    if (!IMGBB_API_KEY) throw new Error('ImgBB API key not found')
+    const formData = new FormData()
+    formData.append('image', file)
+    const res = await fetch(
+      `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    )
+    const data = await res.json()
+    if (!res.ok) throw new Error(data?.error?.message || 'Upload failed')
+    return data.data.display_url as string
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Creating post:", { content, photos, mentions, tags })
-    setContent("")
-    setPhotos([])
-    setMentions([])
-    setTags([])
+    if (!user) {
+      showWarning('Not logged in', 'Please log in to create a post.')
+      return
+    }
+    showLoading("Posting...", "Your post is being created.")
+    try {
+      let uploadedUrls: string[] = []
+      if (imageFiles.length > 0) {
+        uploadedUrls = await Promise.all(
+          imageFiles.map((file) =>
+            uploadImage(file).catch((err) => {
+              console.error('Image upload failed for file', file.name, err)
+              throw err
+            }),
+          ),
+        )
+      }
+
+      const payload = {
+        text,
+        images: uploadedUrls,
+        mentions,
+        tags,
+      }
+      // console.log('Create post payload:', payload)
+      createPost.mutate(payload, {
+        onSuccess: () => {
+          setText("")
+          setImageFiles([])
+          setImagePreviews([])
+          setMentions([])
+          setTags([])
+          showSuccess("Post created", "Your post was published")
+        },
+        onError: (err: any) => {
+          console.error("Create post failed:", err)
+          showError("Create post failed", err?.message || "Unknown error")
+        },
+      })
+    } catch (err: any) {
+      console.error('Upload error:', err)
+      showError('Image upload failed', err?.message || 'Upload error')
+    }
   }
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            setPhotos((prev) => [...prev, event.target!.result as string])
-          }
+    if (!files) return
+    const arr = Array.from(files)
+    setImageFiles((prev) => [...prev, ...arr])
+
+    // generate previews
+    arr.forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImagePreviews((prev) => [...prev, event.target!.result as string])
         }
-        reader.readAsDataURL(file)
-      })
-    }
+      }
+      reader.readAsDataURL(file)
+    })
   }
 
   return (
@@ -54,25 +121,32 @@ export function CreatePost() {
             </Avatar>
             <Textarea
               placeholder="What's on your mind?"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
               className="flex-1 min-h-[80px] resize-none border-0 bg-muted text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"
             />
           </div>
 
-          {photos.length > 0 && (
+          {imagePreviews.length > 0 && (
             <div className="mb-4">
               <div className="flex gap-2 flex-wrap">
-                {photos.map((photo, index) => (
+                {imagePreviews.map((photo, index) => (
                   <div key={index} className="relative">
                     <img
-                      src={photo || "/placeholder.svg"}
+                      src={photo || '/placeholder.svg'}
                       alt={`Upload ${index + 1}`}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                     <button
                       type="button"
-                      onClick={() => setPhotos((prev) => prev.filter((_, i) => i !== index))}
+                      onClick={() => {
+                        setImagePreviews((prev) =>
+                          prev.filter((_, i) => i !== index),
+                        )
+                        setImageFiles((prev) =>
+                          prev.filter((_, i) => i !== index),
+                        )
+                      }}
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                     >
                       <X className="w-3 h-3" />
@@ -93,7 +167,9 @@ export function CreatePost() {
                   @{mention}
                   <button
                     type="button"
-                    onClick={() => setMentions((prev) => prev.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setMentions((prev) => prev.filter((_, i) => i !== index))
+                    }
                     className="text-blue-600 hover:text-blue-800"
                   >
                     <X className="w-3 h-3" />
@@ -108,7 +184,9 @@ export function CreatePost() {
                   #{tag}
                   <button
                     type="button"
-                    onClick={() => setTags((prev) => prev.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setTags((prev) => prev.filter((_, i) => i !== index))
+                    }
                     className="text-green-600 hover:text-green-800"
                   >
                     <X className="w-3 h-3" />
@@ -120,6 +198,25 @@ export function CreatePost() {
 
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                className="text-muted-foreground hover:text-primary"
+                onClick={() => {
+                  if (!user) {
+                    showWarning(
+                      'Not logged in',
+                      'Please log in to upload images.',
+                    )
+                    return
+                  }
+                  fileInputRef.current?.click()
+                }}
+              >
+                <ImageIcon className="w-4 h-4 mr-1" />
+                Image
+              </Button>
               <input
                 type="file"
                 ref={fileInputRef}
@@ -128,56 +225,69 @@ export function CreatePost() {
                 multiple
                 className="hidden"
               />
+
               <Button
                 variant="ghost"
                 size="sm"
                 type="button"
                 className="text-muted-foreground hover:text-primary"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <ImageIcon className="w-4 h-4 mr-1" />
-                Photo
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="text-muted-foreground hover:text-primary"
-                onClick={() => setShowMentionPopup(true)}
+                onClick={() => {
+                  if (!user) {
+                    showWarning(
+                      'Not logged in',
+                      'Please log in to mention friends.',
+                    )
+                    return
+                  }
+                  setShowMentionPopup(true)
+                }}
               >
                 <AtSign className="w-4 h-4 mr-1" />
                 Mention
               </Button>
+              <MentionPopup
+                isOpen={showMentionPopup}
+                onClose={() => setShowMentionPopup(false)}
+                onSelect={setMentions}
+                selectedMentions={mentions}
+              />
+
               <Button
                 variant="ghost"
                 size="sm"
                 type="button"
                 className="text-muted-foreground hover:text-primary"
-                onClick={() => setShowTagPopup(true)}
+                onClick={() => {
+                  if (!user) {
+                    showWarning('Not logged in', 'Please log in to add tags.')
+                    return
+                  }
+                  setShowTagPopup(true)
+                }}
               >
                 <Hash className="w-4 h-4 mr-1" />
                 Tag
               </Button>
+              <TagPopup
+                isOpen={showTagPopup}
+                onClose={() => setShowTagPopup(false)}
+                onSelect={setTags}
+                selectedTags={tags}
+              />
             </div>
 
             <Button
               type="submit"
-              disabled={!content.trim()}
+              disabled={
+                (!text.trim() && imageFiles.length === 0) ||
+                createPost.isPending
+              }
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Post
+              {createPost.isPending ? 'Posting...' : 'Post'}
             </Button>
           </div>
         </form>
-
-        <MentionPopup
-          isOpen={showMentionPopup}
-          onClose={() => setShowMentionPopup(false)}
-          onSelect={setMentions}
-          selectedMentions={mentions}
-        />
-
-        <TagPopup isOpen={showTagPopup} onClose={() => setShowTagPopup(false)} onSelect={setTags} selectedTags={tags} />
       </CardContent>
     </Card>
   )

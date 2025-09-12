@@ -231,7 +231,7 @@ export function ChatPage() {
                     <div className="relative">
                       <Avatar className="h-12 w-12">
                         <AvatarImage
-                          src={user.avatar || '/placeholder.svg'}
+                          src={user.avatar}
                           alt={user.name}
                         />
                         <AvatarFallback>
@@ -275,7 +275,7 @@ export function ChatPage() {
                       <div className="relative">
                         <Avatar className="h-12 w-12">
                           <AvatarImage
-                            src={chat.avatar || '/placeholder.svg'}
+                            src={chat.avatar}
                             alt={chat.name}
                           />
                           <AvatarFallback>
@@ -332,7 +332,7 @@ export function ChatPage() {
                   <div className="relative">
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={selectedChat.avatar || '/placeholder.svg'}
+                        src={selectedChat.avatar}
                         alt={selectedChat.name}
                       />
                       <AvatarFallback>

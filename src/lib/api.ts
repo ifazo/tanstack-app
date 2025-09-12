@@ -47,6 +47,14 @@ export const updatePost = (postId: string, data: Partial<Post>) => api.patch(`/p
 
 export const deletePost = (postId: string) => api.delete(`/posts/${postId}`);
 
+export const getPostReactionByUser = (postId: string) => api.get(`/reacts/posts/${postId}`);
+
+export const addReaction = (postId: string, react: string) => api.post(`/reacts/posts/${postId}?react=${react}`);
+
+export const removeReaction = (postId: string) => api.delete(`/reacts/posts/${postId}`);
+
+export const getUserReactions = () => api.get(`/reacts/posts/user`);
+
 export const getComments = (postId: string) => api.get(`/posts/${postId}/comments`);
 
 export const addComment = (postId: string, data: any) => api.post(`/posts/${postId}/comments`, data);

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests } from "./api";
+import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser } from "./api";
 
 export function useGetUsers() {
   return useQuery({
@@ -28,6 +28,21 @@ export function useGetPost(id: string) {
     queryKey: ["post", id],
     queryFn: () => getPost(id).then(res => res.data),
     enabled: !!id,
+  });
+}
+
+export function useGetPostReactionByUser(postId: string) {
+  return useQuery({
+    queryKey: ["post", postId, "reaction"],
+    queryFn: () => getPostReactionByUser(postId).then(res => res.data),
+    enabled: !!postId,
+  });
+}
+
+export function useGetUserReactions() {
+  return useQuery({
+    queryKey: ["user", "reactions"],
+    queryFn: () => getUserReactions().then(res => res.data),
   });
 }
 

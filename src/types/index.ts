@@ -10,26 +10,48 @@ export type User = {
     password: string;
     name: string;
     image: string;
+    username?: string;
     bio?: string;
-    isOnline?: boolean;
+    phone?: number;
+    location?: string;
+    country?: string;
     createdAt?: string;
     updatedAt?: string;
 };
 
 export type Post = {
-    title: string;
-    description: string;
-    attachments: string[];
-    author: User;
+    text: string;
+    images: string[];
+    mentions: string[];
+    tags: string[];
+}
+
+export type PostRes = {
+    _id: string;
+    text: string;
+    images: string[];
+    mentions: string[];
+    tags: string[];
+    userId: string;
+    user?: User;
+    reactionsCount: number;
+    commentsCount: number;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type Reaction = {
+    userId: string;
+    postId: string;
+    type: string;
     createdAt?: string;
     updatedAt?: string;
 };
 
 export type Comment = {
-    id: number;
-    postId: number;
-    author: User;
-    content: string;
+    userId: string;
+    postId: string;
+    comment: string;
     createdAt?: string;
     updatedAt?: string;
 };

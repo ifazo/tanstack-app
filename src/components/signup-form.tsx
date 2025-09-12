@@ -52,14 +52,6 @@ export function SignupForm({
       email: '',
       password: '',
     },
-    // validators: {
-    //   onChange: z.object({
-    //     name: z.string().min(4, 'Name must be at least 4 characters'),
-    //     image: z.instanceof(File, 'Image is required'),
-    //     email: z.string().email('Invalid email'),
-    //     password: z.string().min(6, 'Password must be at least 6 characters'),
-    //   }),
-    // },
     onSubmit: async ({ value }) => {
       // showLoading('Loading...', 'Please wait while processing.')
       try {
@@ -68,15 +60,15 @@ export function SignupForm({
           imageUrl = await uploadToImgbb(value.image)
         }
         const submitValue = { ...value, image: imageUrl }
-        console.log(submitValue)
+        // console.log(submitValue)
         signUp.mutate(submitValue, {
-          onSuccess: (res) => {
-            console.log('✅ Signed up:', res)
+          onSuccess: () => {
+            // console.log('✅ Signed up:', res)
             showSuccess('Sign up successful!', 'Congratulations!')
             navigate({ to: '/' })
           },
           onError: (err) => {
-            console.error('❌ Sign up failed:', err)
+            // console.error('❌ Sign up failed:', err)
             showError(
               'Sign up failed',
               `Error: ${err.message || 'Unknown error'}`,
