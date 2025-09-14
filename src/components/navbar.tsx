@@ -28,8 +28,8 @@ export function Navbar() {
                   key={item.name}
                   to={item.to}
                   className={cn(
-                    'flex flex-col items-center justify-center text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded-md',
-                    isActive && 'text-primary bg-primary/10',
+                    'flex flex-col items-center justify-center text-foreground hover:text-primary transition-colors px-2 py-1 rounded-md',
+                    isActive && 'text-primary bg-background/50',
                   )}
                 >
                   <item.icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />

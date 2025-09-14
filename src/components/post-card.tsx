@@ -4,11 +4,11 @@ import { useState, useRef, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MessageCircle, Share, MoreHorizontal, ThumbsUp } from 'lucide-react'
+import { MessageCircle, Share, MoreHorizontal, ThumbsUp, User2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { timeAgo } from '@/lib/time'
 import { ReactionsPopup, ReactionType } from './reactions-popup'
-import { PostRes } from '@/types'
+import { PostRes, User } from '@/types'
 import { useGetPostReactionByUser } from '@/lib/queries'
 import { useAddReaction, useRemoveReaction } from '@/lib/mutations'
 import { getUser } from '@/store'
@@ -29,9 +29,9 @@ export function PostCard({ post }: { post: PostRes }) {
   const addReactionMutation = useAddReaction()
   const removeReactionMutation = useRemoveReaction()
 
-  const user = post?.user || { name: 'Unknown', image: '' }
+  const user = post?.user as User;
 
-  const { data } = useGetPostReactionByUser(post._id)
+  const { data } = useGetPostReactionByUser(post._id, user._id)
   const userReact = data?.react ?? null
 
   const [userReaction, setUserReaction] = useState<ReactionType | null>(
@@ -40,9 +40,9 @@ export function PostCard({ post }: { post: PostRes }) {
   const [totalReactions, setTotalReactions] = useState(post.reactionsCount)
 
   useEffect(() => {
-    setUserReaction((userReact as ReactionType) ?? null)
+    setUserReaction((currentUser ? (userReact as ReactionType) : null) ?? null)
     setTotalReactions(post.reactionsCount)
-  }, [data])
+  }, [data, currentUser])
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showReactions, setShowReactions] = useState(false)
@@ -88,9 +88,9 @@ export function PostCard({ post }: { post: PostRes }) {
         <div className="flex items-center justify-between px-4 pb-3">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={user.image} />
+              <AvatarImage src={user?.image} />
               <AvatarFallback>
-                {(user.name && user.name.charAt(0)) || '?'}
+                {(user?.name && user.name.charAt(0)) || <User2 className="w-4 h-4" />}
               </AvatarFallback>
             </Avatar>
             <div>

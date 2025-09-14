@@ -8,6 +8,8 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createServerRootRoute } from '@tanstack/react-start/server'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideoRouteImport } from './routes/video'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -17,6 +19,9 @@ import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChatIndexRouteImport } from './routes/chat/index'
 import { Route as ChatChatIdRouteImport } from './routes/chat/$chatId'
+import { ServerRoute as ApiTagsServerRouteImport } from './routes/api.tags'
+
+const rootServerRouteImport = createServerRootRoute()
 
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
@@ -57,6 +62,11 @@ const ChatChatIdRoute = ChatChatIdRouteImport.update({
   id: '/chat/$chatId',
   path: '/chat/$chatId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTagsServerRoute = ApiTagsServerRouteImport.update({
+  id: '/api/tags',
+  path: '/api/tags',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -133,6 +143,27 @@ export interface RootRouteChildren {
   ChatChatIdRoute: typeof ChatChatIdRoute
   ChatIndexRoute: typeof ChatIndexRoute
 }
+export interface FileServerRoutesByFullPath {
+  '/api/tags': typeof ApiTagsServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/api/tags': typeof ApiTagsServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/api/tags': typeof ApiTagsServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/api/tags'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/api/tags'
+  id: '__root__' | '/api/tags'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  ApiTagsServerRoute: typeof ApiTagsServerRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
@@ -194,6 +225,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/tags': {
+      id: '/api/tags'
+      path: '/api/tags'
+      fullPath: '/api/tags'
+      preLoaderRoute: typeof ApiTagsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+  }
+}
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -208,3 +250,9 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiTagsServerRoute: ApiTagsServerRoute,
+}
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()

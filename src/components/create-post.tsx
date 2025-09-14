@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ImageIcon, AtSign, Hash, X } from 'lucide-react'
+import { ImageIcon, AtSign, Hash, X, User2 } from 'lucide-react'
 import { MentionPopup } from './mention-popup'
 import { TagPopup } from './tag-popup'
 import { useCreatePost } from '@/lib/mutations'
@@ -15,7 +15,7 @@ import { getUser } from '@/store'
 
 export function CreatePost() {
   const user = getUser()
-  const { showSuccess, showError, showWarning, showLoading } = useToast()
+  const { showSuccess, showError, showWarning } = useToast()
   const createPost = useCreatePost()
 
   const [text, setText] = useState('')
@@ -51,7 +51,7 @@ export function CreatePost() {
       showWarning('Not logged in', 'Please log in to create a post.')
       return
     }
-    showLoading("Posting...", "Your post is being created.")
+    // showLoading("Posting...", "Your post is being created.")
     try {
       let uploadedUrls: string[] = []
       if (imageFiles.length > 0) {
@@ -116,8 +116,10 @@ export function CreatePost() {
         <form onSubmit={handleSubmit}>
           <div className="flex gap-3 mb-4">
             <Avatar className="w-10 h-10">
-              <AvatarImage src="/diverse-user-avatars.png" />
-              <AvatarFallback>You</AvatarFallback>
+              <AvatarImage src={user?.image} />
+              <AvatarFallback>
+                {(user?.name && user.name.charAt(0)) || <User2 className="w-4 h-4" />}
+              </AvatarFallback>
             </Avatar>
             <Textarea
               placeholder="What's on your mind?"
@@ -250,6 +252,7 @@ export function CreatePost() {
                 onClose={() => setShowMentionPopup(false)}
                 onSelect={setMentions}
                 selectedMentions={mentions}
+                userId={user?._id}
               />
 
               <Button

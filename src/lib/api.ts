@@ -63,6 +63,14 @@ export const editComment = (postId: string, commentId: string, data: any) => api
 
 export const deleteComment = (postId: string, commentId: string) => api.delete(`/posts/${postId}/comments/${commentId}`);
 
+export const createStory = (data: any) => api.post(`/stories`, data);
+
+export const getFriendsStories = () => api.get(`/stories/friends`);
+
+export const getUserStories = () => api.get("/stories/user");
+
+export const deleteStory = (storyId: string) => api.delete(`/stories/${storyId}`);
+
 export const userChat = () => api.get(`/chats/user`);
 
 export const chatMessages = (chatId: string) => api.get(`/chats/${chatId}/messages`);

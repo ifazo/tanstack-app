@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser } from "./api";
+import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser, getFriendsStories, getUserStories } from "./api";
 
 export function useGetUsers() {
   return useQuery({
@@ -31,11 +31,11 @@ export function useGetPost(id: string) {
   });
 }
 
-export function useGetPostReactionByUser(postId: string) {
+export function useGetPostReactionByUser(postId: string, userId: string) {
   return useQuery({
     queryKey: ["post", postId, "reaction"],
     queryFn: () => getPostReactionByUser(postId).then(res => res.data),
-    enabled: !!postId,
+    enabled: !!userId && !!postId,
   });
 }
 
@@ -54,6 +54,22 @@ export function useGetComments(postId: string) {
   });
 }
 
+export function useGetFriendsStories(userId: string) {
+  return useQuery({
+    queryKey: ["stories", "friends"],
+    queryFn: () => getFriendsStories().then(res => res.data),
+    enabled: !!userId,
+  });
+}
+
+export function useGetUserStories(userId: string) {
+  return useQuery({
+    queryKey: ["stories", "user"],
+    queryFn: () => getUserStories().then(res => res.data),
+    enabled: !!userId,
+  });
+}
+
 export function useUserChat() {
   return useQuery({
     queryKey: ["user", "chats"],
@@ -69,10 +85,11 @@ export function useChatMessages(chatId: string) {
   });
 }
 
-export function useGetFriends() {
+export function useGetFriends(userId: string) {
   return useQuery({
     queryKey: ["friends"],
     queryFn: () => getFriends().then(res => res.data),
+    enabled: !!userId,
   });
 }
 

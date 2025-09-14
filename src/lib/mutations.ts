@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -246,6 +246,30 @@ export function useDeleteComment() {
     },
     onError: (error) => {
       console.error("❌ Delete comment failed:", error);
+    },
+  });
+}
+
+export function useCreateStory() {
+  return useMutation({
+    mutationFn: (data: any) => createStory(data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stories", "user"] });
+    },
+    onError: (error) => {
+      console.error("❌ Create story failed:", error);
+    },
+  });
+}
+
+export function useDeleteStory() {
+  return useMutation({
+    mutationFn: (storyId: string) => deleteStory(storyId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stories", "user"] });
+    },
+    onError: (error) => {
+      console.error("❌ Delete story failed:", error);
     },
   });
 }

@@ -1,19 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, Hash } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { TrendingUp, Hash } from 'lucide-react'
 
 export function TrendingSection() {
   const trendingTopics = [
-    { tag: "ReactJS", posts: "125K posts", category: "Technology" },
-    { tag: "WebDevelopment", posts: "89K posts", category: "Technology" },
-    { tag: "TailwindCSS", posts: "67K posts", category: "Design" },
-    { tag: "NextJS", posts: "54K posts", category: "Technology" },
-    { tag: "TypeScript", posts: "43K posts", category: "Programming" },
-    { tag: "JavaScript", posts: "98K posts", category: "Programming" },
-    { tag: "CSS", posts: "76K posts", category: "Design" },
-    { tag: "NodeJS", posts: "65K posts", category: "Backend" },
-    { tag: "Python", posts: "87K posts", category: "Programming" },
-    { tag: "AI", posts: "112K posts", category: "Technology" },
+    { tag: 'ReactJS', posts: '125K posts', category: 'Technology' },
+    { tag: 'WebDevelopment', posts: '89K posts', category: 'Technology' },
+    { tag: 'TailwindCSS', posts: '67K posts', category: 'Design' },
+    { tag: 'NextJS', posts: '54K posts', category: 'Technology' },
+    { tag: 'TypeScript', posts: '43K posts', category: 'Programming' },
+    { tag: 'JavaScript', posts: '98K posts', category: 'Programming' },
+    { tag: 'CSS', posts: '76K posts', category: 'Design' },
+    { tag: 'NodeJS', posts: '65K posts', category: 'Backend' },
+    { tag: 'Python', posts: '87K posts', category: 'Programming' },
+    { tag: 'AI', posts: '112K posts', category: 'Technology' },
   ]
 
   return (
@@ -33,13 +33,10 @@ export function TrendingSection() {
             >
               <div className="flex items-center gap-3">
                 <Hash className="w-4 h-4 text-muted-foreground" />
-                <div>
-                  <p className="font-medium text-sm">#{topic.tag}</p>
-                  <p className="text-xs text-muted-foreground">{topic.posts}</p>
-                </div>
+                <p className="font-medium text-sm">#{topic.tag}</p>
               </div>
               <Badge variant="secondary" className="text-xs">
-                {topic.category}
+                {topic.posts}
               </Badge>
             </div>
           ))}
@@ -51,11 +48,11 @@ export function TrendingSection() {
 
 export function MobileTrendingSection() {
   const trendingTopics = [
-    { tag: "ReactJS", posts: "125K posts" },
-    { tag: "WebDevelopment", posts: "89K posts" },
-    { tag: "TailwindCSS", posts: "67K posts" },
-    { tag: "NextJS", posts: "54K posts" },
-    { tag: "TypeScript", posts: "43K posts" },
+    { tag: 'ReactJS', posts: '125K posts' },
+    { tag: 'WebDevelopment', posts: '89K posts' },
+    { tag: 'TailwindCSS', posts: '67K posts' },
+    { tag: 'NextJS', posts: '54K posts' },
+    { tag: 'TypeScript', posts: '43K posts' },
   ]
 
   return (

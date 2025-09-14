@@ -40,6 +40,7 @@ import {
   AtSign,
   Earth,
   Loader,
+  Sparkles,
 } from 'lucide-react'
 
 // Mock data for the profile
@@ -727,12 +728,12 @@ export function ProfilePage() {
             >
               <Edit3 className="w-4 h-4" /> Posts
             </TabsTrigger>
-            <TabsTrigger
+            {/* <TabsTrigger
               value="videos"
               className="flex items-center justify-center gap-2 text-sm"
             >
               <TvMinimalPlay className="w-4 h-4" /> Videos
-            </TabsTrigger>
+            </TabsTrigger> */}
             <TabsTrigger
               value="likes"
               className="flex items-center justify-center gap-2 text-sm"
@@ -743,13 +744,19 @@ export function ProfilePage() {
               value="comments"
               className="flex items-center justify-center gap-2 text-sm"
             >
-              <MessageSquare className="w-4 h-4" /> Comments
+              <MessageSquare className="w-4 h-4 text-blue-500" /> Comments
             </TabsTrigger>
             <TabsTrigger
               value="saves"
               className="flex items-center justify-center gap-2 text-sm"
             >
-              <Bookmark className="w-4 h-4" /> Saved
+              <Bookmark className="w-4 h-4 text-green-500" /> Saved
+            </TabsTrigger>
+            <TabsTrigger
+              value="stories"
+              className="flex items-center justify-center gap-2 text-sm"
+            >
+              <Sparkles className="w-4 h-4 text-yellow-500" /> Stories
             </TabsTrigger>
           </TabsList>
 
@@ -921,13 +928,29 @@ export function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Bookmark className="w-5 h-5 text-yellow-500" />
+                  <Bookmark className="w-5 h-5 text-green-500" />
                   Saved Posts
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
                   Posts you've saved will appear here.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="stories" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-yellow-500" />
+                  Your stories
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Stories you've posted will appear here.
                 </p>
               </CardContent>
             </Card>

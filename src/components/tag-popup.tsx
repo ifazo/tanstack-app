@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -14,42 +14,71 @@ interface TagPopupProps {
   selectedTags: string[]
 }
 
-const popularTags = [
-  "photography",
-  "travel",
-  "food",
-  "fitness",
-  "technology",
-  "art",
-  "music",
-  "nature",
-  "lifestyle",
-  "fashion",
-  "business",
-  "motivation",
-  "health",
-  "education",
-  "sports",
-]
-
 export function TagPopup({ isOpen, onClose, onSelect, selectedTags }: TagPopupProps) {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selected, setSelected] = useState<string[]>(selectedTags)
-  const [customTags, setCustomTags] = useState<string[]>([])
+  const [selected, setSelected] = useState<string[]>(selectedTags || [])
+  const [tags, setTags] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const allTags = [...popularTags, ...customTags]
+  useEffect(() => {
+    setSelected(selectedTags || [])
+  }, [selectedTags])
+
+  useEffect(() => {
+    let mounted = true
+    const fetchTags = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch("/api/tags", { cache: "no-store" })
+        if (!res.ok) {
+          setTags([])
+          return
+        }
+        const data = await res.json()
+        if (mounted) setTags(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error("Error fetching tags:", err)
+        if (mounted) setTags([])
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    fetchTags()
+    return () => { mounted = false }
+  }, [])
+
+  const allTags = tags
   const filteredTags = allTags.filter((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const toggleSelection = (tag: string) => {
     setSelected((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]))
   }
 
-  const createCustomTag = () => {
+  const createCustomTag = async () => {
     const trimmedTag = searchTerm.trim().toLowerCase()
-    if (trimmedTag && !allTags.includes(trimmedTag)) {
-      setCustomTags((prev) => [...prev, trimmedTag])
-      setSelected((prev) => [...prev, trimmedTag])
+    if (!trimmedTag || allTags.includes(trimmedTag)) return
+
+    try {
+      setLoading(true)
+      const res = await fetch("/api/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag: trimmedTag }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: "Unknown error" }))
+        throw new Error(err?.message || `Failed to create tag (${res.status})`)
+      }
+
+      const tagsRes = await fetch("/api/tags", { cache: "no-store" })
+      const updated = (await tagsRes.json()) || []
+      setTags(Array.isArray(updated) ? updated : [])
+      setSelected((prev) => (prev.includes(trimmedTag) ? prev : [...prev, trimmedTag]))
       setSearchTerm("")
+    } catch (err: any) {
+      console.error("Create tag failed:", err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -89,6 +118,7 @@ export function TagPopup({ isOpen, onClose, onSelect, selectedTags }: TagPopupPr
               size="sm"
               onClick={createCustomTag}
               className="w-full justify-start bg-transparent"
+              disabled={loading}
             >
               <Plus className="w-4 h-4 mr-2" />
               Create "{searchTerm.trim()}"
@@ -109,6 +139,7 @@ export function TagPopup({ isOpen, onClose, onSelect, selectedTags }: TagPopupPr
                 </Badge>
               ))}
             </div>
+            {loading && <div className="text-xs text-muted-foreground mt-2">Loading…</div>}
           </div>
 
           <div className="flex justify-end gap-2">

@@ -25,6 +25,7 @@ interface MentionPopupProps {
   onClose: () => void
   onSelect: (mentions: string[]) => void
   selectedMentions: string[]
+  userId: string
 }
 
 export function MentionPopup({
@@ -32,11 +33,12 @@ export function MentionPopup({
   onClose,
   onSelect,
   selectedMentions,
+  userId
 }: MentionPopupProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selected, setSelected] = useState<string[]>(selectedMentions ?? [])
-  
-  const { data: friends } = useGetFriends()
+
+  const { data: friends } = useGetFriends(userId)
   // console.log(data, isLoading, error)
 
   useEffect(() => {
@@ -49,9 +51,9 @@ export function MentionPopup({
       friend.username.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  const toggleSelection = (id: string) => {
+  const toggleSelection = (username: string) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id],
+      prev.includes(username) ? prev.filter((u) => u !== username) : [...prev, username],
     )
   }
 
@@ -81,7 +83,7 @@ export function MentionPopup({
               <div
                 key={friend._id}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
-                onClick={() => toggleSelection(friend._id)}
+                onClick={() => toggleSelection(friend.username)}
               >
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={friend.image} />
@@ -93,7 +95,7 @@ export function MentionPopup({
                     @{friend.username}
                   </p>
                 </div>
-                {selected.includes(friend._id) && (
+                {selected.includes(friend.username) && (
                   <Check className="w-4 h-4 text-primary" />
                 )}
               </div>
@@ -103,9 +105,7 @@ export function MentionPopup({
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button onClick={handleConfirm}>
-              Mention ({selected.length})
-            </Button>
+            <Button onClick={handleConfirm}>Mention ({selected.length})</Button>
           </div>
         </div>
       </DialogContent>

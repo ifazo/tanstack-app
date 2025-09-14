@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Users2,
   User2,
+  Facebook,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
@@ -26,10 +27,11 @@ import {
 import { getUser } from '@/store'
 import { useSignOut } from '@/lib/mutations'
 import { Link, useRouterState } from '@tanstack/react-router'
+import { useToast } from '@/hooks/useToast'
 
 const navItems = [
   { name: 'Home', icon: Home, to: '/' },
-  { name: 'Video', icon: Compass, to: '/video' },
+  // { name: 'Video', icon: Compass, to: '/video' },
   { name: 'Chat', icon: MessageCircle, to: '/chat' },
   { name: 'Friends', icon: Users2, to: '/friends' },
   { name: 'Profile', icon: User2, to: '/profile' },
@@ -37,6 +39,7 @@ const navItems = [
 
 export function Header() {
   const user = getUser()
+  const { showSuccess } = useToast()
   const signOut = useSignOut()
 
   const { theme, setTheme } = useTheme()
@@ -51,6 +54,11 @@ export function Header() {
     setTheme(theme === 'dark' ? 'light' : 'dark')
   }
 
+  const handleSignOut = () => {
+    signOut.mutate()
+    showSuccess('Logout successfully', 'You have been logged out.')
+  }
+
   return (
     <>
       <header className="fixed top-1 left-2 right-2 z-50 bg-background/20 backdrop-blur-md border-b border-border/40 rounded-2xl">
@@ -58,20 +66,18 @@ export function Header() {
           {/* Left group: logo, divider, nav */}
           <div className="flex items-center space-x-3">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">
-                  TSA
+                  <Facebook className="h-6 w-6 fill-current" />
                 </span>
               </div>
-              <span className="hidden lg:block font-semibold text-lg text-foreground">
-                Tanstack App
+              <span className="font-semibold text-lg text-foreground">
+                fakebook
               </span>
             </Link>
 
-            {/* vertical divider between logo and nav (hidden on very small creens) */}
-            <div className="hidden sm:block h-6 border-l border-primary" />
             {/* Navigation placed to the left of header, visible at sm+ */}
-            <nav className="hidden sm:flex items-center space-x-2 ml-1">
+            <nav className="hidden sm:flex items-center space-x-2 mx-2">
               {navItems.map((item) => {
                 const isActive = location?.pathname === item.to
                 return (
@@ -79,8 +85,8 @@ export function Header() {
                     key={item.name}
                     to={item.to}
                     className={cn(
-                      'flex items-center space-x-1 text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded-md',
-                      isActive && 'text-primary bg-secondary',
+                      'flex items-center space-x-1 text-foreground hover:text-primary transition-colors px-2 py-1 rounded-sm',
+                      isActive && 'text-primary bg-background/50',
                     )}
                   >
                     <item.icon className="h-5 w-5" />
@@ -98,7 +104,7 @@ export function Header() {
               <Input
                 type="search"
                 placeholder="Search..."
-                className="pl-10 w-full max-w-[180px] sm:max-w-[360px] md:max-w-[520px] lg:max-w-[680px] bg-background/50 border-border/60 focus:bg-background transition-all"
+                className="h-8 pl-10 w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl bg-background/50 border-border/60 focus:bg-background transition-all"
               />
             </div>
 
@@ -124,13 +130,13 @@ export function Header() {
             {user?.email ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="w-9 h-9">
+                  <Button variant="outline" size="icon" className="w-9 h-9 bg-background/50">
                     <User2 className="h-4 w-4" />
                     <span className="sr-only">User menu</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => signOut.mutate()}>
+                  <DropdownMenuItem onClick={() => handleSignOut()}>
                     <LogOut className="h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
@@ -138,7 +144,7 @@ export function Header() {
               </DropdownMenu>
             ) : (
               <Link to="/login" className="flex items-center space-x-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className='bg-background/50'>
                   <LogIn className="h-4 w-4" />
                   <span className="hidden sm:inline">Login</span>
                 </Button>
