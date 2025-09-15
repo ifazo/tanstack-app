@@ -23,8 +23,8 @@ async function writeTags(tags: string[]) {
 }
 
 export const ServerRoute = createServerFileRoute('/api/tags').methods({
-  GET: async ({ request }) => {
-    console.info('Reading tags... @', request.url)
+  GET: async () => {
+    // console.info('Reading tags... @', request.url)
     try {
       const tags = await readTags()
       return json(tags)
@@ -35,7 +35,7 @@ export const ServerRoute = createServerFileRoute('/api/tags').methods({
   },
 
   POST: async ({ request }) => {
-    console.info('Creating tag... @', request.url)
+    // console.info('Creating tag... @', request.url)
     try {
       const body = await request.json().catch(() => ({}))
       const tag = (body?.tag ?? '').toString()

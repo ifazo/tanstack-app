@@ -14,6 +14,7 @@ import {
   Users2,
   User2,
   Facebook,
+  UserPlus,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
@@ -26,7 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { getUser } from '@/store'
 import { useSignOut } from '@/lib/mutations'
-import { Link, useRouterState } from '@tanstack/react-router'
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useToast } from '@/hooks/useToast'
 
 const navItems = [
@@ -39,6 +40,7 @@ const navItems = [
 
 export function Header() {
   const user = getUser()
+  const navigate = useNavigate()
   const { showSuccess } = useToast()
   const signOut = useSignOut()
 
@@ -57,6 +59,8 @@ export function Header() {
   const handleSignOut = () => {
     signOut.mutate()
     showSuccess('Logout successfully', 'You have been logged out.')
+    navigate({ to: '/' })
+
   }
 
   return (
@@ -130,9 +134,12 @@ export function Header() {
             {user?.email ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="w-9 h-9 bg-background/50">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="w-9 h-9 bg-background/50"
+                  >
                     <User2 className="h-4 w-4" />
-                    <span className="sr-only">User menu</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -145,8 +152,8 @@ export function Header() {
             ) : (
               <Link to="/login" className="flex items-center space-x-2">
                 <Button variant="outline" size="sm" className='bg-background/50'>
-                  <LogIn className="h-4 w-4" />
-                  <span className="hidden sm:inline">Login</span>
+                  <UserPlus className="h-4 w-4" />
+                  <span className="hidden md:block">Login</span>
                 </Button>
               </Link>
             )}

@@ -107,36 +107,6 @@ const profileData = {
       mutualFriends: 11,
     },
   ],
-  groups: [
-    {
-      id: '1',
-      name: 'UX Designers Network',
-      members: 1240,
-      avatar: '/diverse-group-meeting.png',
-      isJoined: true,
-    },
-    {
-      id: '2',
-      name: 'San Francisco Tech',
-      members: 856,
-      avatar: '/diverse-family-portrait.png',
-      isJoined: true,
-    },
-    {
-      id: '3',
-      name: 'Coffee Lovers United',
-      members: 2341,
-      avatar: '/diverse-group-meeting.png',
-      isJoined: true,
-    },
-    {
-      id: '4',
-      name: 'Travel Photography',
-      members: 567,
-      avatar: '/diverse-family-portrait.png',
-      isJoined: true,
-    },
-  ],
   posts: [
     {
       id: '1',
@@ -835,7 +805,7 @@ export function ProfilePage() {
           </TabsContent>
 
           {/* Videos Tab */}
-          <TabsContent value="videos" className="space-y-4">
+          {/* <TabsContent value="videos" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">
                 Videos ({profileData.videos.length})
@@ -889,7 +859,7 @@ export function ProfilePage() {
                 </Card>
               ))}
             </div>
-          </TabsContent>
+          </TabsContent> */}
 
           {/* Other Tabs with Placeholder Content */}
           <TabsContent value="likes" className="space-y-4">

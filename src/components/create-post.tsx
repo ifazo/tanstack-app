@@ -74,16 +74,16 @@ export function CreatePost() {
       // console.log('Create post payload:', payload)
       createPost.mutate(payload, {
         onSuccess: () => {
-          setText("")
+          setText('')
           setImageFiles([])
           setImagePreviews([])
           setMentions([])
           setTags([])
-          showSuccess("Post created", "Your post was published")
+          showSuccess('Post created', 'Your post was published')
         },
         onError: (err: any) => {
-          console.error("Create post failed:", err)
-          showError("Create post failed", err?.message || "Unknown error")
+          console.error('Create post failed:', err)
+          showError('Create post failed', err?.message || 'Unknown error')
         },
       })
     } catch (err: any) {
@@ -118,7 +118,9 @@ export function CreatePost() {
             <Avatar className="w-10 h-10">
               <AvatarImage src={user?.image} />
               <AvatarFallback>
-                {(user?.name && user.name.charAt(0)) || <User2 className="w-4 h-4" />}
+                {(user?.name && user.name.charAt(0)) || (
+                  <User2 className="w-4 h-4" />
+                )}
               </AvatarFallback>
             </Avatar>
             <Textarea

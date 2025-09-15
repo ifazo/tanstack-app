@@ -33,16 +33,17 @@ export function useGetPost(id: string) {
 
 export function useGetPostReactionByUser(postId: string, userId: string) {
   return useQuery({
-    queryKey: ["post", postId, "reaction"],
+    queryKey: ["post", postId, "reaction", userId],
     queryFn: () => getPostReactionByUser(postId).then(res => res.data),
     enabled: !!userId && !!postId,
   });
 }
 
-export function useGetUserReactions() {
+export function useGetUserReactions(userId: string) {
   return useQuery({
-    queryKey: ["user", "reactions"],
+    queryKey: ["user", userId, "reactions"],
     queryFn: () => getUserReactions().then(res => res.data),
+    enabled: !!userId,
   });
 }
 
@@ -56,7 +57,7 @@ export function useGetComments(postId: string) {
 
 export function useGetFriendsStories(userId: string) {
   return useQuery({
-    queryKey: ["stories", "friends"],
+    queryKey: ["stories", "friends", userId],
     queryFn: () => getFriendsStories().then(res => res.data),
     enabled: !!userId,
   });
@@ -64,16 +65,17 @@ export function useGetFriendsStories(userId: string) {
 
 export function useGetUserStories(userId: string) {
   return useQuery({
-    queryKey: ["stories", "user"],
+    queryKey: ["stories", "user", userId],
     queryFn: () => getUserStories().then(res => res.data),
     enabled: !!userId,
   });
 }
 
-export function useUserChat() {
+export function useUserChat(userId: string) {
   return useQuery({
-    queryKey: ["user", "chats"],
+    queryKey: ["user", userId, "chats"],
     queryFn: () => userChat().then(res => res.data),
+    enabled: !!userId,
   });
 }
 
@@ -87,22 +89,24 @@ export function useChatMessages(chatId: string) {
 
 export function useGetFriends(userId: string) {
   return useQuery({
-    queryKey: ["friends"],
+    queryKey: ["friends", userId],
     queryFn: () => getFriends().then(res => res.data),
     enabled: !!userId,
   });
 }
 
-export function useGetFriendSuggestions() {
+export function useGetFriendRequests(userId: string) {
   return useQuery({
-    queryKey: ["friend", "suggestions"],
-    queryFn: () => getFriendSuggestions().then(res => res.data),
+    queryKey: ["friend", "requests", userId],
+    queryFn: () => getFriendRequests().then(res => res.data),
+    enabled: !!userId,
   });
 }
 
-export function useGetFriendRequests() {
+export function useGetFriendSuggestions(userId: string) {
   return useQuery({
-    queryKey: ["friend", "requests"],
-    queryFn: () => getFriendRequests().then(res => res.data),
+    queryKey: ["friend", "suggestions", userId],
+    queryFn: () => getFriendSuggestions().then(res => res.data),
+    enabled: !!userId,
   });
 }

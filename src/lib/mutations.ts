@@ -291,7 +291,6 @@ export function useSendFriendRequest() {
   return useMutation({
     mutationFn: (userId: string) => sendFriendRequest(userId).then(res => res.data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
       queryClient.invalidateQueries({ queryKey: ["friends", "suggestions"] });
     },
     onError: (error) => {
@@ -305,7 +304,6 @@ export function useAcceptFriendRequest() {
     mutationFn: (requestId: string) => acceptFriendRequest(requestId).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
     onError: (error) => {
       console.error("❌ Accept friend request failed:", error);
@@ -318,7 +316,6 @@ export function useDeclineFriendRequest() {
     mutationFn: (requestId: string) => declineFriendRequest(requestId).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
-      queryClient.invalidateQueries({ queryKey: ["friends", "suggestions"] });
     },
     onError: (error) => {
       console.error("❌ Decline friend request failed:", error);

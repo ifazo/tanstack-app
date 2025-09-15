@@ -1,4 +1,5 @@
 import { ChatPage } from '@/components/chat-page'
+import { useToast } from '@/hooks/useToast'
 import { useUserChat } from '@/lib/queries'
 import { getUser } from '@/store'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
@@ -9,12 +10,14 @@ export const Route = createFileRoute('/chat/')({
 
 function RouteComponent() {
   const user = getUser()
-    const navigate = useNavigate()
-    
-    if (!user) {
-      navigate({ to: '/login' })
-      return null
-    }
+  const { showWarning } = useToast()
+  const navigate = useNavigate()
+
+  if (!user) {
+    showWarning('Not logged in', 'Please log in to view chat page.')
+    navigate({ to: '/login' })
+    return null
+  }
 
   const { data, isLoading, error } = useUserChat()
   console.log(data, isLoading, error)

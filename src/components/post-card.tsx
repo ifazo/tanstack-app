@@ -4,15 +4,22 @@ import { useState, useRef, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MessageCircle, Share, MoreHorizontal, ThumbsUp, User2 } from 'lucide-react'
+import {
+  MessageCircle,
+  Share,
+  MoreHorizontal,
+  ThumbsUp,
+  User2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { timeAgo } from '@/lib/time'
 import { ReactionsPopup, ReactionType } from './reactions-popup'
-import { PostRes, User } from '@/types'
+import { PostRes } from '@/types'
 import { useGetPostReactionByUser } from '@/lib/queries'
 import { useAddReaction, useRemoveReaction } from '@/lib/mutations'
 import { getUser } from '@/store'
 import { useToast } from '@/hooks/useToast'
+import { Badge } from './ui/badge'
 
 const reactionEmojis: Record<ReactionType, string> = {
   like: '👍',
@@ -24,25 +31,21 @@ const reactionEmojis: Record<ReactionType, string> = {
 }
 
 export function PostCard({ post }: { post: PostRes }) {
+  const user = getUser()
   const { showWarning } = useToast()
-  const currentUser = getUser()
   const addReactionMutation = useAddReaction()
   const removeReactionMutation = useRemoveReaction()
 
-  const user = post?.user as User;
-
-  const { data } = useGetPostReactionByUser(post._id, user._id)
+  const { data } = useGetPostReactionByUser(post?._id, user?._id)
   const userReact = data?.react ?? null
 
   const [userReaction, setUserReaction] = useState<ReactionType | null>(
     (userReact as ReactionType) ?? null,
   )
-  const [totalReactions, setTotalReactions] = useState(post.reactionsCount)
 
   useEffect(() => {
-    setUserReaction((currentUser ? (userReact as ReactionType) : null) ?? null)
-    setTotalReactions(post.reactionsCount)
-  }, [data, currentUser])
+    setUserReaction((user ? (userReact as ReactionType) : null) ?? null)
+  }, [data, user])
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showReactions, setShowReactions] = useState(false)
@@ -50,17 +53,17 @@ export function PostCard({ post }: { post: PostRes }) {
   const reactionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleReaction = (reactionType: ReactionType) => {
-    if (!currentUser) {
-      showWarning("Not logged in", "Please log in to react post!")
+    if (!user) {
+      showWarning('Not logged in', 'Please log in to react post!')
       return
     }
 
     if (reactionType === userReaction) {
       setUserReaction(null)
-      removeReactionMutation.mutate(post._id)
+      removeReactionMutation.mutate(post?._id)
     } else {
       setUserReaction(reactionType)
-      addReactionMutation.mutate({ postId: post._id, react: reactionType })
+      addReactionMutation.mutate({ postId: post?._id, react: reactionType })
     }
   }
 
@@ -88,14 +91,16 @@ export function PostCard({ post }: { post: PostRes }) {
         <div className="flex items-center justify-between px-4 pb-3">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={user?.image} />
+              <AvatarImage src={post?.user?.image} />
               <AvatarFallback>
-                {(user?.name && user.name.charAt(0)) || <User2 className="w-4 h-4" />}
+                {(post?.user?.name && post?.user?.name.charAt(0)) || (
+                  <User2 className="w-4 h-4" />
+                )}
               </AvatarFallback>
             </Avatar>
             <div>
               <h3 className="font-semibold text-card-foreground text-sm">
-                {user.name || 'Unknown'}
+                {post?.user?.name || 'Unknown'}
               </h3>
               <p className="text-muted-foreground text-xs">
                 {timeAgo(post.createdAt)}
@@ -291,10 +296,10 @@ export function PostCard({ post }: { post: PostRes }) {
                 ? userReaction.charAt(0).toUpperCase() + userReaction.slice(1)
                 : 'Like'}
 
-              {totalReactions > 0 && (
-                <span className="text-sm bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
-                  {totalReactions}
-                </span>
+              {post.reactionsCount > 0 && (
+                <Badge variant="outline" className="ml-1">
+                  {post.reactionsCount}
+                </Badge>
               )}
             </Button>
 
@@ -312,9 +317,9 @@ export function PostCard({ post }: { post: PostRes }) {
             <MessageCircle className="w-4 h-4" />
             Comment
             {post.commentsCount > 0 && (
-              <span className="text-sm bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
+              <Badge variant="outline" className="ml-1">
                 {post.commentsCount}
-              </span>
+              </Badge>
             )}
           </Button>
 
