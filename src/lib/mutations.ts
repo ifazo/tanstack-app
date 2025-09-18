@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory, cancelFriendRequest, addSave, removeSave, createPersonalChat, createGroupChat } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -220,14 +220,13 @@ export function useAddComment() {
 export function useEditComment() {
   return useMutation({
     mutationFn: ({
-      postId,
       commentId,
       data,
     }: {
       postId: string;
       commentId: string;
       data: Partial<Comment>;
-    }) => editComment(postId, commentId, data).then(res => res.data),
+    }) => editComment(commentId, data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
@@ -239,13 +238,37 @@ export function useEditComment() {
 
 export function useDeleteComment() {
   return useMutation({
-    mutationFn: ({ postId, commentId }: { postId: string; commentId: string }) =>
-      deleteComment(postId, commentId).then(res => res.data),
+    mutationFn: ({ commentId }: { commentId: string }) =>
+      deleteComment(commentId).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
     onError: (error) => {
       console.error("❌ Delete comment failed:", error);
+    },
+  });
+}
+
+export function useAddSave() {
+  return useMutation({
+    mutationFn: (postId: string) => addSave(postId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", "saves"] });
+    },
+    onError: (error) => {
+      console.error("❌ Add save failed:", error);
+    },
+  });
+}
+
+export function useRemoveSave() {
+  return useMutation({
+    mutationFn: (postId: string) => removeSave(postId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", "saves"] });
+    },
+    onError: (error) => {
+      console.error("❌ Remove save failed:", error);
     },
   });
 }
@@ -274,12 +297,37 @@ export function useDeleteStory() {
   });
 }
 
+export function useCreatePersonalChat() {
+  return useMutation({
+    mutationFn: (receiverId: string) => createPersonalChat(receiverId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+    },
+    onError: (error) => {
+      console.error("❌ Create personal chat failed:", error);
+    },
+  });
+}
+
+export function useCreateGroupChat() {
+  return useMutation({
+    mutationFn: (data: any) => createGroupChat(data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
+    },
+    onError: (error) => {
+      console.error("❌ Create group chat failed:", error);
+    },
+  });
+}
+
 export function useSendMessage() {
   return useMutation({
     mutationFn: ({ chatId, data }: { chatId: string; data: any }) =>
       sendMessage(chatId, data).then(res => res.data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["chats"] });
+      queryClient.invalidateQueries({ queryKey: ["messages", variables.chatId] })
     },
     onError: (error) => {
       console.error("❌ Send message failed:", error);
@@ -319,6 +367,18 @@ export function useDeclineFriendRequest() {
     },
     onError: (error) => {
       console.error("❌ Decline friend request failed:", error);
+    },
+  });
+}
+
+export function useCancelFriendRequest() {
+  return useMutation({
+    mutationFn: (requestId: string) => cancelFriendRequest(requestId).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "requests", "sent"] });
+    },
+    onError: (error) => {
+      console.error("❌ Cancel friend request failed:", error);
     },
   });
 }

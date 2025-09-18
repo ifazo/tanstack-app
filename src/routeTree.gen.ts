@@ -16,9 +16,8 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FriendsRouteImport } from './routes/friends'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChatIndexRouteImport } from './routes/chat/index'
-import { Route as ChatChatIdRouteImport } from './routes/chat/$chatId'
 import { ServerRoute as ApiTagsServerRouteImport } from './routes/api.tags'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -48,19 +47,14 @@ const FriendsRoute = FriendsRouteImport.update({
   path: '/friends',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatIndexRoute = ChatIndexRouteImport.update({
-  id: '/chat/',
-  path: '/chat/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatChatIdRoute = ChatChatIdRouteImport.update({
-  id: '/chat/$chatId',
-  path: '/chat/$chatId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTagsServerRoute = ApiTagsServerRouteImport.update({
@@ -71,77 +65,63 @@ const ApiTagsServerRoute = ApiTagsServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/friends': typeof FriendsRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/video': typeof VideoRoute
-  '/chat/$chatId': typeof ChatChatIdRoute
-  '/chat': typeof ChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/friends': typeof FriendsRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/video': typeof VideoRoute
-  '/chat/$chatId': typeof ChatChatIdRoute
-  '/chat': typeof ChatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/chat': typeof ChatRoute
   '/friends': typeof FriendsRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/video': typeof VideoRoute
-  '/chat/$chatId': typeof ChatChatIdRoute
-  '/chat/': typeof ChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/chat'
     | '/friends'
     | '/login'
     | '/profile'
     | '/signup'
     | '/video'
-    | '/chat/$chatId'
-    | '/chat'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/friends'
-    | '/login'
-    | '/profile'
-    | '/signup'
-    | '/video'
-    | '/chat/$chatId'
-    | '/chat'
+  to: '/' | '/chat' | '/friends' | '/login' | '/profile' | '/signup' | '/video'
   id:
     | '__root__'
     | '/'
+    | '/chat'
     | '/friends'
     | '/login'
     | '/profile'
     | '/signup'
     | '/video'
-    | '/chat/$chatId'
-    | '/chat/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChatRoute: typeof ChatRoute
   FriendsRoute: typeof FriendsRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   VideoRoute: typeof VideoRoute
-  ChatChatIdRoute: typeof ChatChatIdRoute
-  ChatIndexRoute: typeof ChatIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/tags': typeof ApiTagsServerRoute
@@ -202,25 +182,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat/': {
-      id: '/chat/'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat/$chatId': {
-      id: '/chat/$chatId'
-      path: '/chat/$chatId'
-      fullPath: '/chat/$chatId'
-      preLoaderRoute: typeof ChatChatIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -239,13 +212,12 @@ declare module '@tanstack/react-start/server' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChatRoute: ChatRoute,
   FriendsRoute: FriendsRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   VideoRoute: VideoRoute,
-  ChatChatIdRoute: ChatChatIdRoute,
-  ChatIndexRoute: ChatIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

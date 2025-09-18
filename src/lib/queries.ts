@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser, getFriendsStories, getUserStories } from "./api";
+import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser, getFriendsStories, getUserStories, getSentFriendRequests, getPostsByUser, getUserComments, getUserSaves, checkSave } from "./api";
 
 export function useGetUsers() {
   return useQuery({
@@ -11,7 +11,7 @@ export function useGetUsers() {
 export function useGetUser(id: string) {
   return useQuery({
     queryKey: ["user", id],
-    queryFn: () => getUser(id).then(res => res.data),
+    queryFn: () => getUser().then(res => res.data),
     enabled: !!id,
   });
 }
@@ -20,6 +20,14 @@ export function useGetPosts() {
   return useQuery({
     queryKey: ["posts"],
     queryFn: () => getPosts().then(res => res.data),
+  });
+}
+
+export function useGetPostsByUser(userId: string) {
+  return useQuery({
+    queryKey: ["posts", "user"],
+    queryFn: () => getPostsByUser().then(res => res.data),
+    enabled: !!userId,
   });
 }
 
@@ -52,6 +60,30 @@ export function useGetComments(postId: string) {
     queryKey: ["post", postId, "comments"],
     queryFn: () => getComments(postId).then(res => res.data),
     enabled: !!postId,
+  });
+}
+
+export function useGetUserComments(userId: string) {
+  return useQuery({
+    queryKey: ["user", userId, "comments"],
+    queryFn: () => getUserComments().then(res => res.data),
+    enabled: !!userId,
+  });
+}
+
+export const useCheckSave = (postId: string, userId: string) => {
+  return useQuery({
+    queryKey: ["post", postId, "save", userId],
+    queryFn: () => checkSave(postId).then(res => res.data),
+    enabled: !!postId && !!userId,
+  });
+};
+
+export function useGetUserSaves(userId: string) {
+  return useQuery({
+    queryKey: ["user", userId, "saves"],
+    queryFn: () => getUserSaves().then(res => res.data),
+    enabled: !!userId,
   });
 }
 
@@ -99,6 +131,14 @@ export function useGetFriendRequests(userId: string) {
   return useQuery({
     queryKey: ["friend", "requests", userId],
     queryFn: () => getFriendRequests().then(res => res.data),
+    enabled: !!userId,
+  });
+}
+
+export function useGetSentFriendRequests(userId: string) {
+  return useQuery({
+    queryKey: ["friend", "requests", "sent", userId],
+    queryFn: () => getSentFriendRequests().then(res => res.data),
     enabled: !!userId,
   });
 }

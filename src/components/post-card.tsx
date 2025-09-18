@@ -10,13 +10,19 @@ import {
   MoreHorizontal,
   ThumbsUp,
   User2,
+  Bookmark,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { timeAgo } from '@/lib/time'
 import { ReactionsPopup, ReactionType } from './reactions-popup'
 import { PostRes } from '@/types'
-import { useGetPostReactionByUser } from '@/lib/queries'
-import { useAddReaction, useRemoveReaction } from '@/lib/mutations'
+import { useCheckSave, useGetPostReactionByUser } from '@/lib/queries'
+import {
+  useAddReaction,
+  useAddSave,
+  useRemoveReaction,
+  useRemoveSave,
+} from '@/lib/mutations'
 import { getUser } from '@/store'
 import { useToast } from '@/hooks/useToast'
 import { Badge } from './ui/badge'
@@ -35,10 +41,14 @@ export function PostCard({ post }: { post: PostRes }) {
   const { showWarning } = useToast()
   const addReactionMutation = useAddReaction()
   const removeReactionMutation = useRemoveReaction()
+  const addSaveMutation = useAddSave()
+  const removeSaveMutation = useRemoveSave()
 
+  const { data: saveData } = useCheckSave(post?._id, user?._id)
   const { data } = useGetPostReactionByUser(post?._id, user?._id)
   const userReact = data?.react ?? null
 
+  const [isSaved, setIsSaved] = useState(saveData?.isSaved ?? false)
   const [userReaction, setUserReaction] = useState<ReactionType | null>(
     (userReact as ReactionType) ?? null,
   )
@@ -72,6 +82,21 @@ export function PostCard({ post }: { post: PostRes }) {
       handleReaction(userReaction)
     } else {
       handleReaction('like')
+    }
+  }
+
+  const handleSave = () => {
+    if (!user) {
+      showWarning('Not logged in', 'Please log in to save post!')
+      return
+    }
+
+    if (isSaved) {
+      removeSaveMutation.mutate(post._id)
+      setIsSaved(false)
+    } else {
+      addSaveMutation.mutate(post._id)
+      setIsSaved(true)
     }
   }
 
@@ -330,6 +355,20 @@ export function PostCard({ post }: { post: PostRes }) {
           >
             <Share className="w-4 h-4" />
             Share
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex-1 gap-2 text-muted-foreground hover:text-primary"
+            onClick={handleSave}
+          >
+            {isSaved ? (
+              <Bookmark className="w-4 h-4 fill-current text-blue-500" />
+            ) : (
+              <Bookmark className="w-4 h-4" />
+            )}
+            {isSaved ? 'Saved' : 'Save'}
           </Button>
         </div>
       </CardContent>

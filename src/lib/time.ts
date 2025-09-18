@@ -4,7 +4,7 @@ export function timeAgo(iso?: string | null) {
   if (Number.isNaN(date)) return ''
   const now = Date.now()
   const seconds = Math.floor((now - date) / 1000)
-  if (seconds < 5) return 'just now'
+  if (seconds < 60) return 'just now'
   const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
 
   const minutes = Math.floor(seconds / 60)

@@ -10,6 +10,8 @@ import {
   Users,
   UserCheck,
   User2,
+  UserMinus,
+  User,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -22,14 +24,17 @@ import {
   useGetFriendRequests,
   useGetFriends,
   useGetFriendSuggestions,
+  useGetSentFriendRequests,
 } from '@/lib/queries'
 import {
   useSendFriendRequest,
   useAcceptFriendRequest,
   useDeclineFriendRequest,
+  useCancelFriendRequest,
 } from '@/lib/mutations'
 import { getUser } from '@/store'
 import { useToast } from '@/hooks/useToast'
+import { timeAgo } from '@/lib/time'
 
 export function FriendsPage() {
   const user = getUser()
@@ -37,15 +42,18 @@ export function FriendsPage() {
 
   const { data: friendsData } = useGetFriends(user?._id)
   const { data: requestsData } = useGetFriendRequests(user?._id)
+  const { data: sentRequestsData } = useGetSentFriendRequests(user?._id)
   const { data: suggestionsData } = useGetFriendSuggestions(user?._id)
 
   const sendRequest = useSendFriendRequest()
   const acceptRequest = useAcceptFriendRequest()
   const declineRequest = useDeclineFriendRequest()
+  const cancelRequest = useCancelFriendRequest()
 
   const [sendingIds, setSendingIds] = useState<string[]>([])
   const [acceptingIds, setAcceptingIds] = useState<string[]>([])
   const [decliningIds, setDecliningIds] = useState<string[]>([])
+  const [cancellingIds, setCancellingIds] = useState<string[]>([])
 
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('friends')
@@ -120,6 +128,23 @@ export function FriendsPage() {
     })
   }
 
+  const handleCancel = (requestId: string) => {
+    if (!requestId) return
+
+    mark(setCancellingIds, requestId, true)
+    cancelRequest.mutate(requestId, {
+      onSuccess: () => {
+        showSuccess('Friend request cancelled!')
+      },
+      onError: (error: any) => {
+        showError(error?.response?.data?.message || 'Failed to cancel request')
+      },
+      onSettled: () => {
+        mark(setCancellingIds, requestId, false)
+      },
+    })
+  }
+
   return (
     <div className="flex h-screen bg-background">
       <div className="flex-1 flex flex-col">
@@ -148,7 +173,7 @@ export function FriendsPage() {
             onValueChange={setActiveTab}
             className="h-full"
           >
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="friends" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Friends
@@ -172,6 +197,19 @@ export function FriendsPage() {
                 ) : (
                   <Badge variant="outline" className="ml-1">
                     {requestsData?.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="pending" className="flex items-center gap-2">
+                <UserMinus className="h-4 w-4" />
+                Pending
+                {activeTab === 'pending' ? (
+                  <Badge variant="default" className="ml-1">
+                    {sentRequestsData?.length}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="ml-1">
+                    {sentRequestsData?.length}
                   </Badge>
                 )}
               </TabsTrigger>
@@ -220,7 +258,7 @@ export function FriendsPage() {
                                   {friend.name}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  7 mutual friends
+                                  @{friend.userName}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                   active 12 mins ago
@@ -278,10 +316,10 @@ export function FriendsPage() {
                                     {request.name}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    3 mutual friends
+                                    @{request.userName}
                                   </p>
                                   <p className="text-xs text-muted-foreground">
-                                    10 minutes ago
+                                    Received {timeAgo(request?.createdAt)}
                                   </p>
                                 </div>
                               </div>
@@ -302,6 +340,71 @@ export function FriendsPage() {
                                 >
                                   <X className="h-4 w-4" />
                                   {isDeclining ? 'Declining...' : 'Decline'}
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+            
+            {/* Sent Friend Requests */}
+            <TabsContent value="pending" className="h-full">
+              <ScrollArea className="h-full">
+                <div className="space-y-4">
+                  {sentRequestsData?.length === 0 ? (
+                    <p className="text-center text-sm text-muted-foreground py-4">
+                      No requests now
+                    </p>
+                  ) : (
+                    sentRequestsData?.map((request: any) => {
+                      const reqId = request._id ?? request.id
+                      const isCancelling = cancellingIds.includes(reqId)
+                      return (
+                        <Card key={reqId} className="p-0">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <Avatar className="h-12 w-12">
+                                  <AvatarImage src={request?.to.image} />
+                                  <AvatarFallback>
+                                    {(request?.to.name &&
+                                      request.to.name.charAt(0)) || (
+                                      <User2 className="w-4 h-4" />
+                                    )}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium text-foreground">
+                                    {request?.to.name}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    @{request?.to.userName}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Sent {timeAgo(request?.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleCancel(reqId)}
+                                  disabled={isCancelling}
+                                >
+                                  <X className="h-4 w-4" />
+                                  Withdraw
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                >
+                                  <User className="h-4 w-4" />
+                                  Profile
                                 </Button>
                               </div>
                             </div>
@@ -346,10 +449,10 @@ export function FriendsPage() {
                                 {suggestion.name}
                               </p>
                               <p className="text-sm text-muted-foreground mb-2">
-                                5 mutual friends
+                                @{suggestion.userName}
                               </p>
                               <p className="text-xs text-muted-foreground mb-4">
-                                Works at SomeCompany
+                                {suggestion.mutualFriends.length} mutual friends
                               </p>
                               <div className="flex gap-2">
                                 <Button variant="outline" size="sm">

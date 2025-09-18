@@ -50,12 +50,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           <QueryClientProvider client={queryClient}>
-            <div className="pt-16">
+            <div className="pt-17 pb-17 sm:pb-0">
               <Header />
               {children}
               <Navbar />
             </div>
-            <TanstackDevtools
+            {/* <TanstackDevtools
               config={{
                 position: 'bottom-left',
               }}
@@ -65,7 +65,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   render: <TanStackRouterDevtoolsPanel />,
                 },
               ]}
-            />
+            /> */}
           </QueryClientProvider>
         </ThemeProvider>
         <Scripts />

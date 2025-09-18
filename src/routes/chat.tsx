@@ -1,10 +1,9 @@
 import { ChatPage } from '@/components/chat-page'
 import { useToast } from '@/hooks/useToast'
-import { useUserChat } from '@/lib/queries'
 import { getUser } from '@/store'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/chat/')({
+export const Route = createFileRoute('/chat')({
   component: RouteComponent,
 })
 
@@ -19,11 +18,11 @@ function RouteComponent() {
     return null
   }
 
-  const { data, isLoading, error } = useUserChat()
-  console.log(data, isLoading, error)
-  // if (!data) return <div>No chats available</div>
-  // if (isLoading) return <div>Loading chats...</div>
-  // if (error) return <div>Error loading chats: {error.message}</div>
+  // const { data, isLoading, error } = useUserChat(user._id)
+  // console.log(data, isLoading, error)
+  // const { chatId } = useParams({ from: '/chat/$chatId' })
+  //   console.log('chatId:', chatId)
+  //   const { data, isLoading, error } = useChatMessages(chatId)
 
   return (
     <div>

@@ -7,7 +7,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 
 const navItems = [
   { name: 'Home', icon: Home, to: '/' },
-  { name: 'Video', icon: Compass, to: '/video' },
+  // { name: 'Video', icon: Compass, to: '/video' },
   { name: 'Chat', icon: MessageCircle, to: '/chat' },
   { name: 'Friends', icon: Users2, to: '/friends' },
   { name: 'Profile', icon: User2, to: '/profile' },
