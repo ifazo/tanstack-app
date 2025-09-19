@@ -19,7 +19,7 @@ function App() {
           {/* Main Feed */}
           <div className="lg:col-span-2">
             <div className="mb-6">
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold text-foreground mb-2">
                     Home
@@ -28,11 +28,11 @@ function App() {
                     Stay connected with your friends and community
                   </p>
                 </div>
-                {/* <Button variant="outline" size="sm" onClick={handleChangeImages} className="gap-2 bg-transparent">
+                <Button variant="outline" size="sm" onClick={handleChangeImages} className="gap-2 bg-transparent">
                   <ImageIcon className="w-4 h-4" />
                   Change Images
-                </Button> */}
-              </div>
+                </Button>
+              </div> */}
             </div>
 
             <StoriesSection />

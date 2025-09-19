@@ -53,7 +53,7 @@ export function NewChatDialog({
   isCreatingGroup = false,
 }: NewChatDialogProps) {
   const { data: friends, isLoading: isLoadingFriends } = useGetFriends(user?._id)
-
+  console.log("friends:", friends)
   const [friendSearchQuery, setFriendSearchQuery] = useState('')
   const [groupName, setGroupName] = useState('')
   const [groupImage, setGroupImage] = useState('')
@@ -146,7 +146,7 @@ export function NewChatDialog({
                         <div className="relative">
                           <Avatar className="h-10 w-10">
                             <AvatarImage
-                              src={friend.image || '/placeholder.svg'}
+                              src={friend.image}
                             />
                             <AvatarFallback>
                               {(friend.name && friend.name.charAt(0)) || (

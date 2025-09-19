@@ -26,6 +26,7 @@ export function ChatSidebar({
   onNewChatClick,
 }: ChatSidebarProps) {
   const { data: userChatData, isLoading } = useUserChat(user?._id)
+  console.log('User Chat Data:', userChatData)
   const chats = userChatData?.filter((chat: any) =>
     chat.name.toLowerCase().includes(searchQuery.toLowerCase()),
   )

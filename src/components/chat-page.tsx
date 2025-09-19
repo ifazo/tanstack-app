@@ -31,7 +31,7 @@ export function ChatPage() {
 
   const [selectedChat, setSelectedChat] = useState<any | null>(null)
   const { data: userChatMessagesData, isLoading } = useChatMessages(selectedChat?._id ?? null)
-
+  console.log('User Chat Messages Data:', userChatMessagesData)
   const [searchQuery, setSearchQuery] = useState("")
   const [isNewChatOpen, setIsNewChatOpen] = useState(false)
   const [messageText, setMessageText] = useState("")

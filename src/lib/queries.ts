@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUsers, getUser, getPosts, getPost, getComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser, getFriendsStories, getUserStories, getSentFriendRequests, getPostsByUser, getUserComments, getUserSaves, checkSave } from "./api";
+import { getUsers, getUser, getPosts, getPost, getPostComments, userChat, chatMessages, getFriends, getFriendSuggestions, getFriendRequests, getUserReactions, getPostReactionByUser, getFriendsStories, getUserStories, getSentFriendRequests, getPostsByUser, getUserComments, getUserSaves, checkSave } from "./api";
 
 export function useGetUsers() {
   return useQuery({
@@ -58,7 +58,7 @@ export function useGetUserReactions(userId: string) {
 export function useGetComments(postId: string) {
   return useQuery({
     queryKey: ["post", postId, "comments"],
-    queryFn: () => getComments(postId).then(res => res.data),
+    queryFn: () => getPostComments(postId).then(res => res.data),
     enabled: !!postId,
   });
 }

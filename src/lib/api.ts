@@ -57,11 +57,11 @@ export const removeReaction = (postId: string) => api.delete(`/reacts/posts/${po
 
 export const getUserReactions = () => api.get(`/reacts/posts/user`);
 
-export const addComment = (postId: string, data: any) => api.post(`/comments/posts/${postId}`, data);
-
-export const getComments = (postId: string) => api.get(`/comments/post/${postId}`);
-
 export const getUserComments = () => api.get(`/comments/user`);
+
+export const addPostComment = (postId: string, data: any) => api.post(`/comments/posts/${postId}`, data);
+
+export const getPostComments = (postId: string) => api.get(`/comments/post/${postId}`);
 
 export const editComment = (commentId: string, data: any) => api.patch(`/comments/${commentId}`, data);
 

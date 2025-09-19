@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory, cancelFriendRequest, addSave, removeSave, createPersonalChat, createGroupChat } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addPostComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory, cancelFriendRequest, addSave, removeSave, createPersonalChat, createGroupChat } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -207,7 +207,7 @@ export function useRemoveReaction() {
 export function useAddComment() {
   return useMutation({
     mutationFn: ({ postId, data }: { postId: string; data: Comment }) =>
-      addComment(postId, data).then(res => res.data),
+      addPostComment(postId, data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },

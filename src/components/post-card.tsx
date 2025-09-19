@@ -1,9 +1,10 @@
-'use client'
+"use client"
 
-import { useState, useRef, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useState, useRef, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Textarea } from "@/components/ui/textarea"
 import {
   MessageCircle,
   Share,
@@ -11,29 +12,179 @@ import {
   ThumbsUp,
   User2,
   Bookmark,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { timeAgo } from '@/lib/time'
-import { ReactionsPopup, ReactionType } from './reactions-popup'
-import { PostRes } from '@/types'
-import { useCheckSave, useGetPostReactionByUser } from '@/lib/queries'
-import {
-  useAddReaction,
-  useAddSave,
-  useRemoveReaction,
-  useRemoveSave,
-} from '@/lib/mutations'
-import { getUser } from '@/store'
-import { useToast } from '@/hooks/useToast'
-import { Badge } from './ui/badge'
+  Send,
+  Copy,
+  Facebook,
+  Twitter,
+} from "lucide-react"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
+import { timeAgo } from "@/lib/time"
+import { ReactionsPopup, type ReactionType } from "./reactions-popup"
+import type { PostRes } from "@/types"
+import { useCheckSave, useGetPostReactionByUser } from "@/lib/queries"
+import { useAddReaction, useAddSave, useRemoveReaction, useRemoveSave } from "@/lib/mutations"
+import { getUser } from "@/store"
+import { useToast } from "@/hooks/useToast"
+import { Badge } from "./ui/badge"
 
 const reactionEmojis: Record<ReactionType, string> = {
-  like: '👍',
-  love: '❤️',
-  haha: '😂',
-  wow: '😮',
-  sad: '😢',
-  angry: '😡',
+  like: "👍",
+  love: "❤️",
+  haha: "😂",
+  wow: "😮",
+  sad: "😢",
+  angry: "😡",
+}
+
+interface Comment {
+  id: string
+  user: {
+    name: string
+    image?: string
+  }
+  text: string
+  createdAt: string
+  likes: number
+  isLiked: boolean
+}
+
+const mockComments: Comment[] = [
+  {
+    id: "1",
+    user: { name: "John Doe", image: "/placeholder.svg?height=32&width=32" },
+    text: "Great post! Really enjoyed reading this.",
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    likes: 5,
+    isLiked: false,
+  },
+  {
+    id: "2",
+    user: { name: "Jane Smith" },
+    text: "Thanks for sharing this valuable information!",
+    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    likes: 3,
+    isLiked: true,
+  },
+  {
+    id: "3",
+    user: { name: "Mike Johnson", image: "/placeholder.svg?height=32&width=32" },
+    text: "This is exactly what I was looking for. Amazing work!",
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    likes: 8,
+    isLiked: false,
+  },
+  {
+    id: "4",
+    user: { name: "Mike Johnson", image: "/placeholder.svg?height=32&width=32" },
+    text: "This is exactly what I was looking for. Amazing work!",
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    likes: 8,
+    isLiked: false,
+  },
+]
+
+
+function CommentItem({ comment }: { comment: Comment }) {
+  const [isLiked, setIsLiked] = useState(comment.isLiked)
+  const [likes, setLikes] = useState(comment.likes)
+
+  const handleLike = () => {
+    setIsLiked(!isLiked)
+    setLikes(isLiked ? likes - 1 : likes + 1)
+  }
+
+  return (
+    <div className="flex gap-3 py-3">
+      <Avatar className="w-8 h-8">
+        <AvatarImage src={comment.user.image || "/placeholder.svg"} />
+        <AvatarFallback>{comment.user.name.charAt(0) || <User2 className="w-4 h-4" />}</AvatarFallback>
+      </Avatar>
+      <div className="flex-1">
+        <div className="bg-muted rounded-lg px-3 py-2">
+          <h4 className="font-semibold text-sm">{comment.user.name}</h4>
+          <p className="text-sm text-foreground">{comment.text}</p>
+        </div>
+        <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+          <span>{timeAgo(comment.createdAt)}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLike}
+            className={cn("h-auto p-0 text-xs hover:text-primary", isLiked && "text-blue-500")}
+          >
+            <ThumbsUp className="w-3 h-3 mr-1" />
+            Like {likes > 0 && `(${likes})`}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ShareDialog({ post }: { post: PostRes }) {
+  const [copied, setCopied] = useState(false)
+  const postUrl = `${window.location.origin}/post/${post._id}`
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(postUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error("Failed to copy link:", err)
+    }
+  }
+
+  const shareOptions = [
+    {
+      name: "Copy Link",
+      icon: Copy,
+      action: handleCopyLink,
+      description: "Copy link to clipboard",
+    },
+    {
+      name: "Facebook",
+      icon: Facebook,
+      action: () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`),
+      description: "Share on Facebook",
+    },
+    {
+      name: "Twitter",
+      icon: Twitter,
+      action: () =>
+        window.open(
+          `https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(post.text)}`,
+        ),
+      description: "Share on Twitter",
+    },
+  ]
+
+  return (
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>Share Post</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-3">
+        {shareOptions.map((option) => (
+          <Button
+            key={option.name}
+            variant="outline"
+            className="w-full justify-start gap-3 h-12 bg-transparent"
+            onClick={option.action}
+          >
+            <option.icon className="w-5 h-5" />
+            <div className="text-left">
+              <div className="font-medium">{option.name}</div>
+              <div className="text-xs text-muted-foreground">{option.description}</div>
+            </div>
+            {option.name === "Copy Link" && copied && <span className="ml-auto text-green-600 text-sm">Copied!</span>}
+          </Button>
+        ))}
+      </div>
+    </DialogContent>
+  )
 }
 
 export function PostCard({ post }: { post: PostRes }) {
@@ -48,10 +199,17 @@ export function PostCard({ post }: { post: PostRes }) {
   const { data } = useGetPostReactionByUser(post?._id, user?._id)
   const userReact = data?.react ?? null
 
-  const [isSaved, setIsSaved] = useState(saveData?.isSaved ?? false)
-  const [userReaction, setUserReaction] = useState<ReactionType | null>(
-    (userReact as ReactionType) ?? null,
-  )
+  const [isSaved, setIsSaved] = useState(false)
+  const [comments, setComments] = useState<Comment[]>(mockComments)
+  const [newComment, setNewComment] = useState("")
+
+  useEffect(() => {
+    if (saveData?.isSaved !== undefined) {
+      setIsSaved(saveData.isSaved)
+    }
+  }, [saveData])
+
+  const [userReaction, setUserReaction] = useState<ReactionType | null>((userReact as ReactionType) ?? null)
 
   useEffect(() => {
     setUserReaction((user ? (userReact as ReactionType) : null) ?? null)
@@ -62,9 +220,29 @@ export function PostCard({ post }: { post: PostRes }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const reactionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  const handleSubmitComment = () => {
+    if (!user) {
+      showWarning("Not logged in", "Please log in to comment!")
+      return
+    }
+    if (!newComment.trim()) return
+
+    const comment: Comment = {
+      id: Date.now().toString(),
+      user: { name: user.name || "You", image: user.image },
+      text: newComment,
+      createdAt: new Date().toISOString(),
+      likes: 0,
+      isLiked: false,
+    }
+
+    setComments([comment, ...comments])
+    setNewComment("")
+  }
+
   const handleReaction = (reactionType: ReactionType) => {
     if (!user) {
-      showWarning('Not logged in', 'Please log in to react post!')
+      showWarning("Not logged in", "Please log in to react post!")
       return
     }
 
@@ -81,22 +259,25 @@ export function PostCard({ post }: { post: PostRes }) {
     if (userReaction) {
       handleReaction(userReaction)
     } else {
-      handleReaction('like')
+      handleReaction("like")
     }
   }
 
   const handleSave = () => {
     if (!user) {
-      showWarning('Not logged in', 'Please log in to save post!')
+      showWarning("Not logged in", "Please log in to save post!")
       return
     }
-
     if (isSaved) {
-      removeSaveMutation.mutate(post._id)
       setIsSaved(false)
+      removeSaveMutation.mutate(post._id, {
+        onError: () => setIsSaved(true),
+      })
     } else {
-      addSaveMutation.mutate(post._id)
       setIsSaved(true)
+      addSaveMutation.mutate(post._id, {
+        onError: () => setIsSaved(false),
+      })
     }
   }
 
@@ -116,52 +297,33 @@ export function PostCard({ post }: { post: PostRes }) {
         <div className="flex items-center justify-between px-4 pb-3">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={post?.user?.image} />
+              <AvatarImage src={post?.user?.image || "/placeholder.svg"} />
               <AvatarFallback>
-                {(post?.user?.name && post?.user?.name.charAt(0)) || (
-                  <User2 className="w-4 h-4" />
-                )}
+                {(post?.user?.name && post?.user?.name.charAt(0)) || <User2 className="w-4 h-4" />}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-card-foreground text-sm">
-                {post?.user?.name || 'Unknown'}
-              </h3>
-              <p className="text-muted-foreground text-xs">
-                {timeAgo(post.createdAt)}
-              </p>
+              <h3 className="font-semibold text-card-foreground text-sm">{post?.user?.name || "Unknown"}</h3>
+              <p className="text-muted-foreground text-xs">{timeAgo(post.createdAt)}</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Post Content */}
         <div className="px-4 pb-3">
-          <p className="text-card-foreground text-sm leading-relaxed">
-            {post.text}
-          </p>
-          {(post?.mentions && post.mentions.length > 0) ||
-          (post.tags && post.tags.length > 0) ? (
+          <p className="text-card-foreground text-sm leading-relaxed">{post.text}</p>
+          {(post?.mentions && post.mentions.length > 0) || (post.tags && post.tags.length > 0) ? (
             <div className="mt-3 flex flex-wrap gap-2">
               {post.mentions?.map((mention: string) => (
-                <span
-                  key={mention}
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium"
-                >
+                <span key={mention} className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm font-medium">
                   @{mention}
                 </span>
               ))}
               {post.tags?.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="text-green-600 hover:text-green-800 cursor-pointer text-sm font-medium"
-                >
+                <span key={tag} className="text-green-600 hover:text-green-800 cursor-pointer text-sm font-medium">
                   #{tag}
                 </span>
               ))}
@@ -176,12 +338,12 @@ export function PostCard({ post }: { post: PostRes }) {
               ref={scrollContainerRef}
               className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
               onScroll={handleScroll}
-              style={{ scrollBehavior: 'smooth' }}
+              style={{ scrollBehavior: "smooth" }}
             >
               {post.images?.map((image, index) => (
                 <div key={index} className="flex-shrink-0 w-full snap-start">
                   <img
-                    src={image || '/placeholder.svg'}
+                    src={image || "/placeholder.svg"}
                     alt={`Post image ${index + 1}`}
                     className="w-full h-96 object-cover select-none"
                     draggable={false}
@@ -198,61 +360,35 @@ export function PostCard({ post }: { post: PostRes }) {
                       const newIndex = Math.max(0, currentImageIndex - 1)
                       scrollContainerRef.current.scrollTo({
                         left: newIndex * scrollContainerRef.current.clientWidth,
-                        behavior: 'smooth',
+                        behavior: "smooth",
                       })
                     }
                   }}
                   className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-                  style={{ display: currentImageIndex > 0 ? 'block' : 'none' }}
+                  style={{ display: currentImageIndex > 0 ? "block" : "none" }}
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
 
                 <button
                   onClick={() => {
                     if (scrollContainerRef.current) {
-                      const newIndex = Math.min(
-                        post.images.length - 1,
-                        currentImageIndex + 1,
-                      )
+                      const newIndex = Math.min(post.images.length - 1, currentImageIndex + 1)
                       scrollContainerRef.current.scrollTo({
                         left: newIndex * scrollContainerRef.current.clientWidth,
-                        behavior: 'smooth',
+                        behavior: "smooth",
                       })
                     }
                   }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
                   style={{
-                    display:
-                      currentImageIndex < post.images.length - 1
-                        ? 'block'
-                        : 'none',
+                    display: currentImageIndex < post.images.length - 1 ? "block" : "none",
                   }}
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               </>
@@ -270,8 +406,8 @@ export function PostCard({ post }: { post: PostRes }) {
                   <div
                     key={index}
                     className={cn(
-                      'w-2 h-2 rounded-full transition-colors',
-                      index === currentImageIndex ? 'bg-white' : 'bg-white/50',
+                      "w-2 h-2 rounded-full transition-colors",
+                      index === currentImageIndex ? "bg-white" : "bg-white/50",
                     )}
                   />
                 ))}
@@ -306,20 +442,16 @@ export function PostCard({ post }: { post: PostRes }) {
               size="sm"
               onClick={handleReactionClick}
               className={cn(
-                'w-full gap-2 text-muted-foreground hover:text-primary',
-                userReaction && 'text-blue-500 hover:text-blue-600',
+                "w-full gap-2 text-muted-foreground hover:text-primary",
+                userReaction && "text-blue-500 hover:text-blue-600",
               )}
             >
               {userReaction ? (
-                <span className="text-base">
-                  {reactionEmojis[userReaction]}
-                </span>
+                <span className="text-base">{reactionEmojis[userReaction]}</span>
               ) : (
                 <ThumbsUp className="w-4 h-4" />
               )}
-              {userReaction
-                ? userReaction.charAt(0).toUpperCase() + userReaction.slice(1)
-                : 'Like'}
+              {userReaction ? userReaction.charAt(0).toUpperCase() + userReaction.slice(1) : "Like"}
 
               {post.reactionsCount > 0 && (
                 <Badge variant="outline" className="ml-1">
@@ -328,34 +460,74 @@ export function PostCard({ post }: { post: PostRes }) {
               )}
             </Button>
 
-            <ReactionsPopup
-              isVisible={showReactions}
-              onReactionSelect={handleReaction}
-            />
+            <ReactionsPopup isVisible={showReactions} onReactionSelect={handleReaction} />
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex-1 gap-2 text-muted-foreground hover:text-primary"
-          >
-            <MessageCircle className="w-4 h-4" />
-            Comment
-            {post.commentsCount > 0 && (
-              <Badge variant="outline" className="ml-1">
-                {post.commentsCount}
-              </Badge>
-            )}
-          </Button>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant="ghost" size="sm" className="flex-1 gap-2 text-muted-foreground hover:text-primary">
+                <MessageCircle className="w-4 h-4" />
+                Comment
+                {post.commentsCount > 0 && (
+                  <Badge variant="outline" className="ml-1">
+                    {post.commentsCount}
+                  </Badge>
+                )}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[80vh]">
+              <DrawerHeader>
+                <DrawerTitle>Comments ({comments.length})</DrawerTitle>
+              </DrawerHeader>
+              <div className="px-4 pb-4 overflow-y-auto">
+                {/* Comment input */}
+                <div className="flex gap-3 mb-4 sticky top-0 bg-background pb-3 border-b">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={user?.image || "/placeholder.svg"} />
+                    <AvatarFallback>{user?.name?.charAt(0) || <User2 className="w-4 h-4" />}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 flex gap-2">
+                    <Textarea
+                      placeholder="Write a comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="min-h-[40px] resize-none"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault()
+                          handleSubmitComment()
+                        }
+                      }}
+                    />
+                    <Button size="sm" onClick={handleSubmitComment} disabled={!newComment.trim()}>
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex-1 gap-2 text-muted-foreground hover:text-primary"
-          >
-            <Share className="w-4 h-4" />
-            Share
-          </Button>
+                {/* Comments list */}
+                <div className="space-y-1">
+                  {comments.length > 0 ? (
+                    comments.map((comment) => <CommentItem key={comment.id} comment={comment} />)
+                  ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                      No comments yet. Be the first to comment!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="flex-1 gap-2 text-muted-foreground hover:text-primary">
+                <Share className="w-4 h-4" />
+                Share
+              </Button>
+            </DialogTrigger>
+            <ShareDialog post={post} />
+          </Dialog>
 
           <Button
             variant="ghost"
@@ -363,12 +535,8 @@ export function PostCard({ post }: { post: PostRes }) {
             className="flex-1 gap-2 text-muted-foreground hover:text-primary"
             onClick={handleSave}
           >
-            {isSaved ? (
-              <Bookmark className="w-4 h-4 fill-current text-blue-500" />
-            ) : (
-              <Bookmark className="w-4 h-4" />
-            )}
-            {isSaved ? 'Saved' : 'Save'}
+            {isSaved ? <Bookmark className="w-4 h-4 fill-current text-blue-500" /> : <Bookmark className="w-4 h-4" />}
+            {isSaved ? "Saved" : "Save"}
           </Button>
         </div>
       </CardContent>
