@@ -258,7 +258,7 @@ export function FriendsPage() {
                                   {friend.name}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  @{friend.userName}
+                                  @{friend.username}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                   active 12 mins ago
@@ -316,7 +316,7 @@ export function FriendsPage() {
                                     {request.name}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    @{request.userName}
+                                    @{request.username}
                                   </p>
                                   <p className="text-xs text-muted-foreground">
                                     Received {timeAgo(request?.createdAt)}
@@ -383,7 +383,7 @@ export function FriendsPage() {
                                     {request?.to.name}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    @{request?.to.userName}
+                                    @{request?.to.username}
                                   </p>
                                   <p className="text-xs text-muted-foreground">
                                     Sent {timeAgo(request?.createdAt)}
@@ -449,7 +449,7 @@ export function FriendsPage() {
                                 {suggestion.name}
                               </p>
                               <p className="text-sm text-muted-foreground mb-2">
-                                @{suggestion.userName}
+                                @{suggestion.username}
                               </p>
                               <p className="text-xs text-muted-foreground mb-4">
                                 {suggestion.mutualFriends.length} mutual friends

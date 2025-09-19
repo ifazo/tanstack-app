@@ -63,8 +63,7 @@ const profileData = {
   user: {
     id: '1',
     name: 'Sarah Johnson',
-    username: '@sarah.johnson',
-    userName: 'sarah-johnson',
+    username: 'sarah-johnson',
     bio: 'UX Designer passionate about creating meaningful digital experiences. Coffee enthusiast ☕ | Travel lover 🌍',
     image: '/professional-woman-designer.png',
     coverImage: '/abstract-gradient-design-background.jpg',
@@ -473,7 +472,7 @@ export function ProfilePage() {
 
   const [editedProfile, setEditedProfile] = useState({
     name: user?.name || profileData.user.name,
-    userName: user?.userName || profileData.user.userName,
+    username: user?.username || profileData.user.username,
     bio: user?.bio || profileData.user.bio,
     location: user?.location || profileData.user.location,
     country: user?.country || profileData.user.country,
@@ -593,7 +592,7 @@ export function ProfilePage() {
   }
 
   const copyProfileLink = async () => {
-    const profileLink = `${window.location.origin}/profile/${editedProfile.userName}`
+    const profileLink = `${window.location.origin}/profile/${editedProfile.username}`
     try {
       await navigator.clipboard.writeText(profileLink)
       setIsLinkCopied(true)
@@ -646,7 +645,7 @@ export function ProfilePage() {
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
                     <AtSign className="w-4 h-4" />
-                    {user?.userName || profileData.user.username}
+                    {user?.username || profileData.user.username}
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
@@ -725,11 +724,11 @@ export function ProfilePage() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Username</label>
                         <Input
-                          value={editedProfile.userName}
+                          value={editedProfile.username}
                           onChange={(e) =>
                             setEditedProfile((prev) => ({
                               ...prev,
-                              userName: e.target.value,
+                              username: e.target.value,
                             }))
                           }
                           placeholder="Enter username"
@@ -929,7 +928,7 @@ export function ProfilePage() {
                           {editedProfile.name}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          @{editedProfile.userName}
+                          @{editedProfile.username}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {editedProfile.location}
@@ -943,7 +942,7 @@ export function ProfilePage() {
                       </label>
                       <div className="flex gap-2">
                         <Input
-                          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${editedProfile.userName}`}
+                          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${editedProfile.username}`}
                           readOnly
                           className="flex-1"
                         />

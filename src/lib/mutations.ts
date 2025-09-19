@@ -204,9 +204,9 @@ export function useRemoveReaction() {
   });
 }
 
-export function useAddComment() {
+export function useAddPostComment() {
   return useMutation({
-    mutationFn: ({ postId, data }: { postId: string; data: Comment }) =>
+    mutationFn: ({ postId, data }: { postId: string; data: any }) =>
       addPostComment(postId, data).then(res => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });

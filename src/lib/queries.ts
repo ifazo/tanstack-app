@@ -55,7 +55,7 @@ export function useGetUserReactions(userId: string) {
   });
 }
 
-export function useGetComments(postId: string) {
+export function useGetPostComments(postId: string) {
   return useQuery({
     queryKey: ["post", postId, "comments"],
     queryFn: () => getPostComments(postId).then(res => res.data),

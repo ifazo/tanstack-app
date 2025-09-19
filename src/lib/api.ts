@@ -59,7 +59,7 @@ export const getUserReactions = () => api.get(`/reacts/posts/user`);
 
 export const getUserComments = () => api.get(`/comments/user`);
 
-export const addPostComment = (postId: string, data: any) => api.post(`/comments/posts/${postId}`, data);
+export const addPostComment = (postId: string, data: any) => api.post(`/comments/post/${postId}`, data);
 
 export const getPostComments = (postId: string) => api.get(`/comments/post/${postId}`);
 
