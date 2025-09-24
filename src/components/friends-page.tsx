@@ -362,7 +362,7 @@ export function FriendsPage() {
                     </p>
                   ) : (
                     sentRequestsData?.map((request: any) => {
-                      const reqId = request._id ?? request.id
+                      const reqId = request._id
                       const isCancelling = cancellingIds.includes(reqId)
                       return (
                         <Card key={reqId} className="p-0">

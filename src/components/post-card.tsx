@@ -211,14 +211,13 @@ export function PostCard({ post }: { post: PostRes }) {
   const removeSaveMutation = useRemoveSave()
 
   const { data: commentsData } = useGetPostComments(post?._id)
-  // console.log('commentsData', commentsData)
   const { data: saveData } = useCheckSave(post?._id, user?._id)
   const { data } = useGetPostReactionByUser(post?._id, user?._id)
   const userReact = data?.react ?? null
 
   const [isSaved, setIsSaved] = useState(false)
   const [comments, setComments] = useState<any[]>(commentsData)
-  const [newComment, setNewComment] = useState('')
+  const [commentText, setCommentText] = useState('')
   const [userReaction, setUserReaction] = useState<ReactionType | null>(
     (userReact as ReactionType) ?? null,
   )
@@ -249,25 +248,25 @@ export function PostCard({ post }: { post: PostRes }) {
       showWarning('Not logged in', 'Please log in to comment!')
       return
     }
-    if (!newComment.trim()) return
+    if (!commentText.trim()) return
 
-    const commentData = { text: newComment.trim() }
+    const commentData = { text: commentText.trim() }
 
     addPostComment.mutate(
       { postId: post?._id, data: commentData },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
           showSuccess('Success', 'Comment added successfully.')
-          // const comment = {
-          //   _id: res.data._id,
-          //   user: { name: user.name, image: user.image },
-          //   text: newComment,
-          //   createdAt: new Date().toISOString(),
-          //   likes: 0,
-          //   isLiked: false,
-          // }
-          // setComments([comment, ...comments])
-          setNewComment('')
+          const comment = {
+            _id: res.insertedId,
+            user: { name: user.name, image: user.image },
+            text: commentText,
+            createdAt: new Date().toISOString(),
+            // likes: 0,
+            // isLiked: false,
+          }
+          setComments([comment, ...comments])
+          setCommentText('')
         },
         onError: () => {
           showError('Error', 'Failed to add comment. Please try again.')
@@ -583,8 +582,8 @@ export function PostCard({ post }: { post: PostRes }) {
                   <div className="flex-1 flex gap-2">
                     <Textarea
                       placeholder="Write a comment..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
                       className="min-h-[40px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -596,7 +595,7 @@ export function PostCard({ post }: { post: PostRes }) {
                     <Button
                       size="sm"
                       onClick={handleSubmitComment}
-                      disabled={!newComment.trim()}
+                      disabled={!commentText.trim()}
                     >
                       <Send className="w-4 h-4" />
                     </Button>
