@@ -6,7 +6,7 @@ import {
   signInWithGithub,
   signOut,
 } from "./firebase";
-import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addPostComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory, cancelFriendRequest, addSave, removeSave, createPersonalChat, createGroupChat } from "./api";
+import { createPost, createUser, deleteComment, deletePost, editComment, loginUser, addPostComment, updatePost, sendMessage, sendFriendRequest, acceptFriendRequest, declineFriendRequest, addReaction, removeReaction, createStory, deleteStory, cancelFriendRequest, addSave, removeSave, createPersonalChat, createGroupChat, updateUser, deleteUser } from "./api";
 import { queryClient } from "@/routes/__root";
 import { saveToken, saveUser, clearAllStoredData } from "@/store";
 import { Comment, Post } from "@/types";
@@ -136,6 +136,31 @@ export function useSignOut() {
     },
     onError: (error) => {
       console.error("❌ Sign out failed:", error);
+    },
+  });
+}
+
+export function useUpdateUser() {
+  return useMutation({
+    mutationFn: (data: any) => updateUser(data).then(res => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      console.error("❌ Update user failed:", error);
+    },
+  });
+}
+
+export function useDeleteUser() {
+  return useMutation({
+    mutationFn: () => deleteUser().then(res => res.data),
+    onSuccess: () => {
+      clearAllStoredData();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      console.error("❌ Delete user failed:", error);
     },
   });
 }

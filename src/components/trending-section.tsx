@@ -56,7 +56,7 @@ export function MobileTrendingSection() {
   ]
 
   return (
-    <div className="lg:hidden my-6">
+    <div>
       <div className="flex items-center gap-2 mb-3 px-4">
         <TrendingUp className="w-5 h-5 text-primary" />
         <h3 className="font-semibold text-lg">Trending Topics</h3>

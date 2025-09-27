@@ -6,7 +6,7 @@ import { PostCardSkeleton } from './post-card-skeleton'
 
 export function PostFeed() {
   const { data, isLoading } = useGetPosts()
-
+  console.log(data)
   if (isLoading) {
     return (
       <div className="space-y-6">

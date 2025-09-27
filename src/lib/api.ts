@@ -1,5 +1,5 @@
 import { getToken } from "@/store";
-import { Auth, Post, User } from "@/types";
+import { Auth, Post } from "@/types";
 import axios from "axios";
 
 const baseUrl = import.meta.env.VITE_API_URL;
@@ -33,7 +33,7 @@ export const getUsers = () => api.get("/users/all");
 
 export const getUser = () => api.get(`/users`);
 
-export const updateUser = (data: Partial<User>) => api.patch(`/users`, data);
+export const updateUser = (data: any) => api.patch(`/users`, data);
 
 export const deleteUser = () => api.delete(`/users`);
 

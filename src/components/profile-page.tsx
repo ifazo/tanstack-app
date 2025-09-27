@@ -56,6 +56,9 @@ import { getUser } from '@/store'
 import { timeAgo } from '@/lib/time'
 import { ReactionType } from './reactions-popup'
 import { PostCard } from './post-card'
+import { useUpdateUser } from '@/lib/mutations'
+import { useToast } from '@/hooks/useToast'
+import { UserPostCard } from './user-post-card'
 
 const reactionEmojis: Record<ReactionType, string> = {
   like: '👍',
@@ -68,17 +71,22 @@ const reactionEmojis: Record<ReactionType, string> = {
 
 export function ProfilePage() {
   const currentUser = getUser()
-  const { data: user } = useGetUser(currentUser._id)
-  const { data: userPosts } = useGetPostsByUser(user?._id)
-  const { data: userReactions } = useGetUserReactions(user?._id)
-  const { data: userComments } = useGetUserComments(user?._id)
-  const { data: userSaves } = useGetUserSaves(user?._id)
-  const { data: userStories } = useGetUserStories(user?._id)
-  // console.log('Posts by user:', userPosts)
-  // console.log('User reactions:', userReactions)
-  // console.log('User comments:', userComments)
-  // console.log('User saves:', userSaves)
-  // console.log('User stories:', userStories)
+  const { showSuccess, showError } = useToast()
+  const { data: user, isLoading: isLoadingUser } = useGetUser(currentUser._id)
+  const { data: userPosts, isLoading: isLoadingUserPosts } = useGetPostsByUser(
+    user?._id,
+  )
+  const { data: userReactions, isLoading: isLoadingUserReactions } =
+    useGetUserReactions(user?._id)
+  const { data: userComments, isLoading: isLoadingUserComments } =
+    useGetUserComments(user?._id)
+  const { data: userSaves, isLoading: isLoadingUserSaves } = useGetUserSaves(
+    user?._id,
+  )
+  const { data: userStories, isLoading: isLoadingUserStories } =
+    useGetUserStories(user?._id)
+    
+  const updateUser = useUpdateUser()
 
   const [activeTab, setActiveTab] = useState('posts')
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -93,8 +101,8 @@ export function ProfilePage() {
     bio: user?.bio,
     location: user?.location,
     country: user?.country,
-    phone: user?.phone?.replace(/^\\+\\d+\\s/, ''),
-    phoneCountryCode: user?.phone?.match(/^(\\+\\d+)\\s/)?.[1],
+    phone: user?.phone?.replace(/^\+\d+\s/, ''),
+    phoneCountryCode: user?.phone?.match(/^(\+\d+)\s/)?.[1],
   })
 
   const [isGettingLocation, setIsGettingLocation] = useState(false)
@@ -196,9 +204,26 @@ export function ProfilePage() {
   }
 
   const handleSaveProfile = () => {
-    console.log('Saving profile:', editedProfile)
-    // Here you would typically save to backend
-    setIsEditDialogOpen(false)
+    // console.log('Saving profile:', editedProfile)
+    updateUser.mutate(
+      {
+        _id: user._id,
+        name: editedProfile.name,
+        bio: editedProfile.bio,
+        location: editedProfile.location,
+        country: editedProfile.country,
+        phone: `${editedProfile.phoneCountryCode} ${editedProfile.phone}`,
+      },
+      {
+        onSuccess: () => {
+          showSuccess('Profile updated successfully!')
+          setIsEditDialogOpen(false)
+        },
+        onError: (error: any) => {
+          showError(error?.message || 'Failed to update profile.')
+        },
+      },
+    )
   }
 
   const copyProfileLink = async () => {
@@ -242,8 +267,9 @@ export function ProfilePage() {
               <Avatar className="w-32 h-32 border-4 border-background shadow-lg animate-pulse-hover">
                 <AvatarImage src={user?.image} />
                 <AvatarFallback className="text-2xl font-semibold bg-secondary text-primary-foreground">
-                  {(user?.name && user?.name.charAt(0)) ||
-                    <User2 className="w-8 h-8" />}
+                  {(user?.name && user?.name.charAt(0)) || (
+                    <User2 className="w-8 h-8" />
+                  )}
                 </AvatarFallback>
               </Avatar>
 
@@ -281,13 +307,13 @@ export function ProfilePage() {
                 <div className="flex gap-6 text-sm">
                   <span className="hover:text-primary transition-colors cursor-pointer">
                     <strong className="text-primary">
-                      {user.friendsCount || 0}
+                      {user?.friendsCount || 0}
                     </strong>{' '}
                     Friends
                   </span>
                   <span className="hover:text-primary transition-colors cursor-pointer">
                     <strong className="text-primary">
-                      {user.followersCount || 0}
+                      {user?.followersCount || 0}
                     </strong>{' '}
                     Followers
                   </span>
@@ -310,12 +336,14 @@ export function ProfilePage() {
                   <DialogHeader>
                     <DialogTitle>Edit Profile</DialogTitle>
                   </DialogHeader>
+
                   <div className="space-y-4 py-4">
+                    {/* Name + Username */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Name</label>
                         <Input
-                          value={editedProfile.name}
+                          value={editedProfile.name || ''}
                           onChange={(e) =>
                             setEditedProfile((prev) => ({
                               ...prev,
@@ -328,13 +356,7 @@ export function ProfilePage() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Username</label>
                         <Input
-                          value={editedProfile.username}
-                          onChange={(e) =>
-                            setEditedProfile((prev) => ({
-                              ...prev,
-                              username: e.target.value,
-                            }))
-                          }
+                          value={editedProfile.username || ''}
                           placeholder="Enter username"
                           readOnly
                           disabled
@@ -342,14 +364,14 @@ export function ProfilePage() {
                       </div>
                     </div>
 
+                    {/* Location + Country */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Location</label>
                         <Input
-                          value={editedProfile.location}
+                          value={editedProfile.location || ''}
                           readOnly
                           placeholder="Automatically detect location"
-                          className="flex-1"
                         />
                       </div>
 
@@ -382,7 +404,6 @@ export function ProfilePage() {
                                     <div className="flex items-center gap-2">
                                       <img
                                         src={country.flag}
-                                        alt={country.name}
                                         className="w-6 h-4"
                                       />
                                       <span>{country.name}</span>
@@ -408,6 +429,7 @@ export function ProfilePage() {
                       </div>
                     </div>
 
+                    {/* Phone Number */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
                         Phone Number
@@ -443,7 +465,7 @@ export function ProfilePage() {
                                       className="w-6 h-4"
                                     />
                                     <span>{country.dialCode}</span>
-                                    <span className="text-sm text-muted-foreground">
+                                    <span className="text-xs text-muted-foreground">
                                       {country.name}
                                     </span>
                                   </div>
@@ -453,7 +475,7 @@ export function ProfilePage() {
                           </SelectContent>
                         </Select>
                         <Input
-                          value={editedProfile.phone}
+                          value={editedProfile.phone || ''}
                           onChange={(e) =>
                             setEditedProfile((prev) => ({
                               ...prev,
@@ -466,10 +488,11 @@ export function ProfilePage() {
                       </div>
                     </div>
 
+                    {/* Bio */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Bio</label>
                       <Textarea
-                        value={editedProfile.bio}
+                        value={editedProfile.bio || ''}
                         onChange={(e) =>
                           setEditedProfile((prev) => ({
                             ...prev,
@@ -481,17 +504,31 @@ export function ProfilePage() {
                       />
                     </div>
 
+                    {/* Save / Cancel */}
                     <div className="grid grid-cols-2 gap-2 pt-4">
                       <Button onClick={handleSaveProfile} className="w-full">
-                        <Save className="w-4 h-4" />
+                        <Save className="w-4 h-4 mr-2" />
                         Save
                       </Button>
                       <Button
                         variant="outline"
-                        onClick={() => setIsEditDialogOpen(false)}
+                        onClick={() => {
+                          // Reset back to original user data
+                          setEditedProfile({
+                            name: user?.name || '',
+                            username: user?.username || '',
+                            bio: user?.bio || '',
+                            location: user?.location || '',
+                            country: user?.country || '',
+                            phone: user?.phone?.replace(/^\+\d+\s/, '') || '',
+                            phoneCountryCode:
+                              user?.phone?.match(/^\+(\d+)/)?.[0] || '',
+                          })
+                          setIsEditDialogOpen(false)
+                        }}
                         className="w-full"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-4 h-4 mr-2" />
                         Cancel
                       </Button>
                     </div>
@@ -516,9 +553,7 @@ export function ProfilePage() {
                   <div className="space-y-4 py-4">
                     <div className="flex items-center gap-3 p-4 border rounded-lg">
                       <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={user?.image}
-                        />
+                        <AvatarImage src={user?.image} />
                         <AvatarFallback>
                           {(editedProfile.name &&
                             editedProfile.name.charAt(0)) || (
@@ -627,10 +662,18 @@ export function ProfilePage() {
               <h2 className="text-2xl font-bold">My Posts</h2>
               <Badge variant="secondary">{userPosts?.length} total</Badge>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {userPosts?.map((post: any) => (
-                <PostCard key={post._id} post={post} />
-              ))}
+            <div className="grid grid-cols-1 gap-6">
+              {userPosts?.length === 0 ? (
+                <p className="text-center text-muted-foreground py-10">
+                  No posts yet.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-6">
+                  {userPosts?.map((post: any) => (
+                    <UserPostCard key={post._id} post={post} />
+                  ))}
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -642,53 +685,59 @@ export function ProfilePage() {
               </h2>
               <Badge variant="secondary">{userReactions?.length} total</Badge>
             </div>
-            <div className="space-y-3">
-              {userReactions?.map((post: any) => (
-                <Card key={post._id} className="overflow-hidden">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={post.postUser.image} />
-                        <AvatarFallback>
-                          {(post.postUser.name &&
-                            post.postUser.name.charAt(0)) || (
-                            <User2 className="w-4 h-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium text-sm">
-                            {post.postUser.name}
+            {userReactions?.length === 0 ? (
+              <p className="text-center text-muted-foreground py-10">
+                No reactions yet.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {userReactions?.map((post: any) => (
+                  <Card key={post._id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={post.postUser.image} />
+                          <AvatarFallback>
+                            {(post.postUser.name &&
+                              post.postUser.name.charAt(0)) || (
+                              <User2 className="w-4 h-4" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm">
+                              {post.postUser.name}
+                            </p>
+                            <span className="text-xs text-muted-foreground">
+                              •
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {timeAgo(post.createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {post.post.text}
                           </p>
-                          <span className="text-xs text-muted-foreground">
-                            •
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">
+                            {
+                              reactionEmojis[
+                                post.react as keyof typeof reactionEmojis
+                              ]
+                            }
                           </span>
-                          <span className="text-xs text-muted-foreground">
-                            {timeAgo(post.createdAt)}
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {post.react}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {post.post.text}
-                        </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">
-                          {
-                            reactionEmojis[
-                              post.react as keyof typeof reactionEmojis
-                            ]
-                          }
-                        </span>
-                        <span className="text-xs text-muted-foreground capitalize">
-                          {post.react}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="comments" className="space-y-6">
@@ -699,56 +748,61 @@ export function ProfilePage() {
               </h2>
               <Badge variant="secondary">{userComments?.length} total</Badge>
             </div>
+            {userComments?.length === 0 ? (
+              <p className="text-center text-muted-foreground py-10">
+                No comments yet.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {userComments?.map((comment: any) => (
+                  <Card
+                    key={comment._id}
+                    className="overflow-hidden hover:shadow-md transition-all"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={comment.postUser?.image} />
+                          <AvatarFallback>
+                            {(comment.postUser?.name &&
+                              comment.postUser.name.charAt(0)) || (
+                              <User2 className="w-4 h-4" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
 
-            <div className="space-y-3">
-              {userComments?.map((comment: any) => (
-                <Card
-                  key={comment._id}
-                  className="overflow-hidden hover:shadow-md transition-all"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={comment.postUser?.image} />
-                        <AvatarFallback>
-                          {(comment.postUser?.name &&
-                            comment.postUser.name.charAt(0)) || (
-                            <User2 className="w-4 h-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
+                        <div className="flex-1 min-w-0">
+                          {/* user + time */}
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm">
+                              {comment.postUser?.name}
+                            </p>
+                            <span className="text-xs text-muted-foreground">
+                              •
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {timeAgo(comment.createdAt)}
+                            </span>
+                          </div>
 
-                      <div className="flex-1 min-w-0">
-                        {/* user + time */}
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium text-sm">
-                            {comment.postUser?.name}
+                          {/* post text */}
+                          <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
+                            {comment.post?.text}
                           </p>
-                          <span className="text-xs text-muted-foreground">
-                            •
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {timeAgo(comment.createdAt)}
-                          </span>
-                        </div>
 
-                        {/* post text */}
-                        <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                          {comment.post?.text}
-                        </p>
-
-                        {/* comment text */}
-                        <div className="bg-muted/30 rounded-lg p-3 border-l-4 border-blue-500">
-                          <p className="text-sm text-foreground leading-relaxed">
-                            {comment.text}
-                          </p>
+                          {/* comment text */}
+                          <div className="bg-muted/30 rounded-lg p-3 border-l-4 border-blue-500">
+                            <p className="text-sm text-foreground leading-relaxed">
+                              {comment.text}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="saves" className="space-y-6">
@@ -759,53 +813,58 @@ export function ProfilePage() {
               </h2>
               <Badge variant="secondary">{userSaves?.length} total</Badge>
             </div>
+            {userSaves?.length === 0 ? (
+              <p className="text-center text-muted-foreground py-10">
+                No saved posts yet.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {userSaves?.map((post: any) => (
+                  <Card key={post._id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-4">
+                        {/* avatar */}
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={post.postUser.image} />
+                          <AvatarFallback>
+                            {(post.postUser.name &&
+                              post.postUser.name.charAt(0)) || (
+                              <User2 className="w-4 h-4" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
 
-            <div className="space-y-3">
-              {userSaves?.map((post: any) => (
-                <Card key={post._id} className="overflow-hidden">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                      {/* avatar */}
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={post.postUser.image} />
-                        <AvatarFallback>
-                          {(post.postUser.name &&
-                            post.postUser.name.charAt(0)) || (
-                            <User2 className="w-4 h-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      {/* post content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium text-sm">
-                            {post.postUser.name}
+                        {/* post content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm">
+                              {post.postUser.name}
+                            </p>
+                            <span className="text-xs text-muted-foreground">
+                              •
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {timeAgo(post.createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {post.post.text}
                           </p>
-                          <span className="text-xs text-muted-foreground">
-                            •
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {timeAgo(post.createdAt)}
-                          </span>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {post.post.text}
-                        </p>
-                      </div>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground hover:text-green-600"
-                      >
-                        <Bookmark className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground hover:text-green-600"
+                        >
+                          <Bookmark className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="stories" className="space-y-6">
@@ -816,51 +875,57 @@ export function ProfilePage() {
               </h2>
               <Badge variant="secondary">{userStories?.length} total</Badge>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {userStories?.map((story: any) => (
-                <Card
-                  key={story._id}
-                  className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 aspect-[3/4]"
-                  onClick={() => openStoryFullscreen(story)}
-                >
-                  <CardContent className="p-0 h-full">
-                    <div className="relative h-full">
-                      <img
-                        src={story.media}
-                        alt={story.caption}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+            {userStories?.length === 0 ? (
+              <p className="text-center text-muted-foreground py-10">
+                No stories yet.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {userStories?.map((story: any) => (
+                  <Card
+                    key={story._id}
+                    className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 aspect-[3/4]"
+                    onClick={() => openStoryFullscreen(story)}
+                  >
+                    <CardContent className="p-0 h-full">
+                      <div className="relative h-full">
+                        <img
+                          src={story.media}
+                          alt={story.caption}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
-                      <div className="absolute top-2 right-2">
-                        {story.type === 'video' ? (
-                          <div className="bg-black/80 text-white rounded-full p-1">
-                            <MonitorPlay className="w-3 h-3" />
-                          </div>
-                        ) : (
-                          <div className="bg-black/80 text-white rounded-full p-1">
-                            <Camera className="w-3 h-3" />
-                          </div>
-                        )}
-                      </div>
+                        <div className="absolute top-2 right-2">
+                          {story.type === 'video' ? (
+                            <div className="bg-black/80 text-white rounded-full p-1">
+                              <MonitorPlay className="w-3 h-3" />
+                            </div>
+                          ) : (
+                            <div className="bg-black/80 text-white rounded-full p-1">
+                              <Camera className="w-3 h-3" />
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                        {/* <p className="text-xs font-medium mb-1 line-clamp-2">
+                        <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                          {/* <p className="text-xs font-medium mb-1 line-clamp-2">
                           {story.caption}
                         </p> */}
-                        <div className="flex items-center justify-between text-xs opacity-80">
-                          <span>{timeAgo(story.createdAt)}</span>
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-3 h-3" />
-                            <span>{story.views || 0}</span>
+                          <div className="flex items-center justify-between text-xs opacity-80">
+                            <span>{timeAgo(story.createdAt)}</span>
+                            <div className="flex items-center gap-1">
+                              <Eye className="w-3 h-3" />
+                              <span>{story.views || 0}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
