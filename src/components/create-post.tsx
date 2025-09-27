@@ -111,7 +111,7 @@ export function CreatePost() {
   }
 
   return (
-    <Card className="mb-6 bg-card border-border">
+    <Card className="p-0 mb-6 bg-card border-border">
       <CardContent className="p-4">
         <form onSubmit={handleSubmit}>
           <div className="flex gap-3 mb-4">

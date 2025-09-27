@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Plus, User2 } from 'lucide-react'
+import { ArrowRight, Plus, User2 } from 'lucide-react'
 import { StoryUpload } from './story-upload'
 import { StoryViewer } from './story-viewer'
 import { getUser } from '@/store'
 import { useToast } from '@/hooks/useToast'
 import { useGetFriendsStories } from '@/lib/queries'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Link } from '@tanstack/react-router'
 
 interface Story {
   userId: string
@@ -33,7 +34,7 @@ export function StoriesSection() {
   const { showWarning } = useToast()
 
   const { data, isLoading } = useGetFriendsStories(user?._id)
-  
+
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(0)
@@ -65,7 +66,6 @@ export function StoriesSection() {
               <Skeleton className="h-3 w-12 rounded" />
             </Card>
           </div>
-
           {/* Skeletons for friends’ stories */}
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex-shrink-0">
@@ -76,6 +76,20 @@ export function StoriesSection() {
             </div>
           ))}
         </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="mb-6 flex items-center justify-center rounded-full bg-muted px-4 py-1 text-sm text-muted-foreground">
+        <Link
+          to="/login"
+          className="flex items-center font-medium"
+        >
+          Log in to view and create stories
+          <ArrowRight className="ml-2 w-4 h-4" />
+        </Link>
       </div>
     )
   }
@@ -122,8 +136,8 @@ export function StoriesSection() {
         </div>
 
         {/* Friends' Stories */}
-        {data?.map((friend: Story) => {
-          const latestStory = friend.stories[0] // newest because backend sorted
+        {data.map((friend: Story) => {
+          const latestStory = friend.stories[0] // backend sorted
           return (
             <div key={friend.userId} className="flex-shrink-0">
               <Card
@@ -141,12 +155,10 @@ export function StoriesSection() {
                     src={latestStory?.media}
                     muted
                     loop
-                    autoPlay={false}
                     controls={false}
                     poster="/placeholder-video.jpg"
                   />
                 )}
-
                 <div className="relative h-full flex flex-col justify-between p-2">
                   <div className="flex justify-center">
                     <Avatar className="w-10 h-10 border-2 border-background">
@@ -160,7 +172,6 @@ export function StoriesSection() {
                       </AvatarFallback>
                     </Avatar>
                   </div>
-
                   <div className="text-center">
                     <div className="bg-black/40 rounded-md px-1 py-0.5 backdrop-blur-sm">
                       <span
